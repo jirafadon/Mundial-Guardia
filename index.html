@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Mundial Central Puerto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="topbar">
+<div class="logo">⚽ Mundial <span>Central Puerto</span></div>
+
+<button class="theme-btn" onclick="toggleTheme()">
+🌙 / ☀️ Tema
+</button>
+</div>
+
+<section class="hero">
+<h1>Mundial 2026 + Guardias</h1>
+<p>
+Sistema interactivo de fixture mundialista conectado al diagrama operativo de guardias.
+La aplicación detecta automáticamente qué guardia trabaja durante cada partido.
+</p>
+</section>
+
+<div class="grid">
+
+<div class="card">
+<div class="card-title">🔥 Partido destacado</div>
+
+<div class="today-match">
+<div class="big">🇦🇷 Argentina vs Austria</div>
+<div>🕘 14:00 hs</div>
+<div>🏟 Dallas</div>
+<div class="badge argentina">👷 Guardia C</div>
+</div>
+</div>
+
+<div class="card">
+<div class="card-title">🏆 Estado Mundial</div>
+
+<div class="status-list">
+<div class="badge">📅 Fase de grupos</div>
+<div class="badge">⚽ 104 partidos</div>
+<div class="badge">🇦🇷 Argentina clasificada</div>
+</div>
+</div>
+
+</div>
+
+<div class="card mt">
+<div class="card-title">📅 Fixture completo</div>
+
+<div class="fixture">
+
+<table>
+<thead>
+<tr>
+<th>Fecha</th>
+<th>Hora</th>
+<th>Partido</th>
+<th>Fase</th>
+<th>Guardia</th>
+</tr>
+</thead>
+
+<tbody>
+
+<tr>
+<td>16 JUN</td>
+<td>22:00</td>
+<td>🇦🇷 Argentina vs Argelia</td>
+<td class="phase">Grupos</td>
+<td><span class="guard">Guardia A</span></td>
+</tr>
+
+<tr>
+<td>17 JUN</td>
+<td>17:00</td>
+<td>🏴 Inglaterra vs Croacia</td>
+<td class="phase">Grupos</td>
+<td><span class="guard">Guardia C</span></td>
+</tr>
+
+<tr>
+<td>18 JUN</td>
+<td>22:00</td>
+<td>🇲🇽 México vs Corea</td>
+<td class="phase">Grupos</td>
+<td><span class="guard">Guardia B</span></td>
+</tr>
+
+<tr>
+<td>22 JUN</td>
+<td>14:00</td>
+<td>🇦🇷 Argentina vs Austria</td>
+<td class="phase">Grupos</td>
+<td><span class="guard">Guardia C</span></td>
+</tr>
+
+<tr>
+<td>27 JUN</td>
+<td>23:00</td>
+<td>🇦🇷 Jordania vs Argentina</td>
+<td class="phase">Grupos</td>
+<td><span class="guard">Guardia C</span></td>
+</tr>
+
+<tr>
+<td>19 JUL</td>
+<td>16:00</td>
+<td>🏆 Gran Final</td>
+<td class="phase">Final</td>
+<td><span class="guard">Guardia C</span></td>
+</tr>
+
+</tbody>
+</table>
+
+</div>
+</div>
+
+<div class="card mt">
+
+<div class="card-title">📊 Diagrama de Guardias</div>
+
+<div class="diagram-grid">
+
+<div></div>
+<div class="dg-head">1</div>
+<div class="dg-head">2</div>
+<div class="dg-head">3</div>
+<div class="dg-head">4</div>
+<div class="dg-head">5</div>
+<div class="dg-head">6</div>
+<div class="dg-head">7</div>
+<div class="dg-head">8</div>
+<div class="dg-head">9</div>
+<div class="dg-head">10</div>
+<div class="dg-head">11</div>
+<div class="dg-head">12</div>
+<div class="dg-head">13</div>
+<div class="dg-head">14</div>
+<div class="dg-head">15</div>
+<div class="dg-head">16</div>
+<div class="dg-head">17</div>
+<div class="dg-head">18</div>
+<div class="dg-head">19</div>
+<div class="dg-head">20</div>
+<div class="dg-head">21</div>
+<div class="dg-head">22</div>
+<div class="dg-head">23</div>
+<div class="dg-head">24</div>
+<div class="dg-head">25</div>
+<div class="dg-head">26</div>
+<div class="dg-head">27</div>
+<div class="dg-head">28</div>
+<div class="dg-head">29</div>
+<div class="dg-head">30</div>
+<div class="dg-head">31</div>
+
+<div class="dg-cell label">Guardia A</div>
+<div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell arg-day">⚽</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell arg-day">⚽</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell arg-day">⚽</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div>
+
+</div>
+</div>
+
+<div class="footer">
+Página creada por <span>Joni de la planta</span> ⚡
+</div>
+
+</div>
+
+<script src="app.js"></script>
+
+</body>
+</html>
