@@ -1,184 +1,805 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Mundial Central Puerto</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#080b0f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Mundial 2026 · Central Puerto</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700;800;900&family=DM+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ff:'DM Sans',system-ui,sans-serif;
+  --fm:'DM Mono',ui-monospace,monospace;
+  --bg:#080b0f;--panel:#0f1318;--panel2:#141920;
+  --brd:#1a2230;--brd2:#222d3a;
+  --amber:#f5a623;--text:#b8c4d0;--tdim:#485560;--tbright:#e8f0f8;
+  --cell:#0a0e14;
+  --t1:#5ba3d9;--t2:#3dba78;--t3:#ff8c42;--t4:#b07ee8;
+  --arg:#74acdf;
+  --ga:#f5a623;--gb:#3dba78;--gc:#4a9eda;--gd:#b07ee8;--ge:#e05252;
+}
+body.light{
+  --bg:#eef1f5;--panel:#fff;--panel2:#f5f8fc;--brd:#cdd6e2;
+  --text:#283040;--tdim:#7080a0;--tbright:#0f1828;--cell:#f0f4f8;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{background:var(--bg);-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text);font-family:var(--ff);
+  min-height:100svh;-webkit-font-smoothing:antialiased;
+  overscroll-behavior:none;-webkit-user-select:none;user-select:none}
+input,select,[contenteditable]{-webkit-user-select:text;user-select:text}
+button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;cursor:pointer}
+
+.wrap{max-width:680px;margin:0 auto;padding:14px 11px calc(env(safe-area-inset-bottom,0px)+52px)}
+@media(min-width:680px){.wrap{padding:22px 20px}}
+
+/* ─ HEADER ─ */
+header{text-align:center;margin-bottom:14px;padding-bottom:13px;border-bottom:1px solid var(--brd)}
+.trophy{font-size:30px;line-height:1;margin-bottom:4px}
+h1{font-size:clamp(19px,5.5vw,34px);font-weight:900;color:var(--tbright);
+   letter-spacing:3px;text-transform:uppercase;line-height:1.1}
+h1 em{color:var(--amber);font-style:normal}
+.hsub{font-family:var(--fm);font-size:9px;color:var(--tdim);letter-spacing:2px;margin-top:4px}
+.hrow{display:flex;justify-content:center;gap:8px;margin-top:9px;flex-wrap:wrap}
+.tbtn{background:none;border:1px solid var(--brd);color:var(--tdim);
+  font-family:var(--fm);font-size:10px;padding:5px 12px;border-radius:4px;
+  transition:all .2s;letter-spacing:1px;min-height:32px}
+.tbtn:active{border-color:var(--amber);color:var(--amber)}
+
+/* ─ HERO NEXT MATCH ─ */
+.hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.hero-card{background:var(--panel);border:1px solid var(--brd);border-radius:11px;
+  padding:12px;position:relative;overflow:hidden}
+.hero-card.world{border-left:3px solid var(--amber)}
+.hero-card.arg  {border-left:3px solid var(--arg)}
+.hc-glow{position:absolute;inset:0;pointer-events:none;border-radius:11px;opacity:.07}
+.hero-card.world .hc-glow{background:radial-gradient(ellipse at 80% 20%,var(--amber),transparent 65%)}
+.hero-card.arg   .hc-glow{background:radial-gradient(ellipse at 80% 20%,var(--arg),transparent 65%)}
+.hc-lbl{font-family:var(--fm);font-size:7.5px;letter-spacing:2px;font-weight:700;margin-bottom:5px;text-transform:uppercase}
+.hero-card.world .hc-lbl{color:var(--amber)}
+.hero-card.arg   .hc-lbl{color:var(--arg)}
+.hc-teams{font-size:11.5px;font-weight:800;color:var(--tbright);line-height:1.3;margin-bottom:5px}
+.hc-teams .hl{color:var(--arg)}
+.hc-meta{font-family:var(--fm);font-size:9px;color:var(--tdim);line-height:1.8}
+.hc-meta b{color:var(--amber)}
+.hc-guard{display:inline-block;font-family:var(--fm);font-size:9px;font-weight:700;
+  padding:2px 7px;border-radius:3px;margin-top:4px}
+.hc-cd{font-family:var(--fm);font-size:10px;font-weight:700;color:var(--tbright);margin-top:5px}
+
+/* ─ SECTION ─ */
+.sec{background:var(--panel);border:1px solid var(--brd);border-radius:10px;margin-bottom:9px;overflow:hidden}
+.sec.s-arg  {border-left:3px solid var(--arg)}
+.sec.s-wld  {border-left:3px solid var(--amber)}
+.sec.s-diag {border-left:3px solid var(--t4)}
+.sec.s-leg  {border-left:3px solid var(--tdim)}
+.shdr{display:flex;align-items:center;gap:9px;padding:12px 13px;
+  -webkit-tap-highlight-color:transparent}
+.shdr:active{background:rgba(255,255,255,.025)}
+.si{font-size:17px;flex-shrink:0}
+.st{font-family:var(--ff);font-size:11.5px;letter-spacing:2px;text-transform:uppercase;font-weight:700;flex:1}
+.sec.s-arg  .st{color:var(--arg)}
+.sec.s-wld  .st{color:var(--amber)}
+.sec.s-diag .st{color:var(--t4)}
+.sec.s-leg  .st{color:var(--tdim)}
+.sbadge{font-family:var(--fm);font-size:8.5px;color:var(--tdim)}
+.sarr{font-family:var(--fm);font-size:11px;color:var(--tdim);transition:transform .2s;flex-shrink:0}
+.sbody{border-top:1px solid var(--brd);display:none;padding:13px}
+.sbody.open{display:block;animation:fu .22s ease}
+@keyframes fu{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+
+/* ─ ARG MATCHES ─ */
+.am{position:relative;background:var(--cell);border:1px solid var(--brd);
+  border-left:3px solid var(--arg);border-radius:8px;padding:11px 13px;margin-bottom:7px}
+.am.next{border-color:rgba(116,172,223,.38);box-shadow:0 0 18px rgba(116,172,223,.07)}
+.am-phase{font-family:var(--fm);font-size:7.5px;color:var(--tdim);letter-spacing:2px;margin-bottom:3px}
+.am-teams{font-size:16px;font-weight:800;color:var(--tbright);margin-bottom:7px;line-height:1.2}
+.am-teams .hl{color:var(--arg)}
+.am-meta{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.badge{display:inline-flex;align-items:center;font-family:var(--fm);font-size:9px;
+  padding:3px 8px;border-radius:3px;font-weight:600;letter-spacing:.3px;white-space:nowrap}
+.b-date{background:rgba(255,255,255,.04);border:1px solid var(--brd);color:var(--text)}
+.b-time{background:rgba(245,166,35,.09);border:1px solid rgba(245,166,35,.22);color:var(--amber)}
+.b-city{background:rgba(255,255,255,.03);border:1px solid var(--brd);color:var(--tdim)}
+.b-g{font-weight:700;font-size:9.5px;padding:3px 9px;border-radius:3px;letter-spacing:.3px}
+.next-tag{position:absolute;top:9px;right:9px;font-family:var(--fm);font-size:7.5px;
+  background:var(--amber);color:#000;padding:2px 7px;border-radius:3px;font-weight:800;letter-spacing:1px}
+
+/* ─ PHASE TABS ─ */
+.ptabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:11px}
+.pt{background:none;border:1px solid var(--brd);color:var(--tdim);
+  font-family:var(--fm);font-size:8.5px;padding:5px 9px;border-radius:4px;
+  letter-spacing:.3px;transition:all .15s;white-space:nowrap;min-height:30px}
+.pt.on{background:rgba(245,166,35,.09);border-color:var(--amber);color:var(--amber)}
+.pt:active{opacity:.7}
+
+/* ─ MATCH CARDS ─ */
+.match-list{display:flex;flex-direction:column;gap:5px}
+.mc{background:var(--cell);border:1px solid var(--brd);border-radius:7px;
+  padding:9px 11px;display:flex;align-items:flex-start;gap:9px;transition:background .12s}
+.mc.arg-row{border-color:rgba(116,172,223,.28);background:rgba(10,18,28,.9)}
+.mc:active{background:rgba(255,255,255,.02)}
+.mc-time{flex-shrink:0;width:42px;text-align:right}
+.mc-tv{font-family:var(--fm);font-size:13px;font-weight:700;color:var(--amber);line-height:1.1}
+.mc-td{font-family:var(--fm);font-size:7.5px;color:var(--tdim);line-height:1.4;margin-top:1px}
+.mc-body{flex:1;min-width:0}
+.mc-name{font-size:12.5px;font-weight:700;color:var(--tbright);line-height:1.3}
+.mc-name.arg{color:var(--arg);font-size:13.5px}
+.mc-city{font-family:var(--fm);font-size:8px;color:var(--tdim);margin-top:2px}
+.mc-right{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.gp{font-family:var(--fm);font-size:8.5px;font-weight:700;padding:2px 7px;border-radius:3px;white-space:nowrap}
+.ph-hdr{font-family:var(--fm);font-size:7.5px;color:var(--amber);letter-spacing:3px;
+  padding:7px 9px;background:rgba(245,166,35,.04);border:1px solid rgba(245,166,35,.11);
+  border-radius:4px;margin-bottom:4px;margin-top:7px;text-transform:uppercase}
+.ph-hdr:first-child{margin-top:0}
+
+/* ─ DIAGRAM ─ */
+.diag-outer{overflow-x:auto;-webkit-overflow-scrolling:touch;
+  scrollbar-width:thin;scrollbar-color:var(--brd) transparent}
+.diag-outer::-webkit-scrollbar{height:3px}
+.diag-outer::-webkit-scrollbar-thumb{background:var(--brd);border-radius:2px}
+.scroll-hint{font-family:var(--fm);font-size:8px;color:var(--tdim);
+  text-align:center;padding:4px 0 9px;letter-spacing:1px;opacity:.7}
+table.gt{border-collapse:collapse}
+table.gt th,table.gt td{border:1px solid var(--brd);text-align:center;padding:1px;line-height:1}
+table.gt th{background:var(--cell);font-family:var(--fm);font-size:7px;color:var(--tdim);
+  min-width:30px;width:30px;padding:3px 1px;white-space:nowrap;letter-spacing:.3px}
+table.gt th.gn{min-width:44px;width:44px;text-align:left;padding-left:7px;font-size:8px}
+table.gt td{background:var(--cell);min-width:30px;width:30px;height:30px;vertical-align:middle;position:relative}
+table.gt td.gn{min-width:44px;width:44px;text-align:left;padding-left:7px;
+  font-family:var(--fm);font-size:9px;font-weight:700;height:auto;vertical-align:middle}
+/* turno cell backgrounds */
+table.gt td.t1{background:rgba(91,163,217,.12)}
+table.gt td.t2{background:rgba(61,186,120,.12)}
+table.gt td.t3{background:rgba(255,140,66,.12)}
+table.gt td.t4{background:rgba(176,126,232,.12)}
+table.gt td.tf{background:rgba(220,38,38,.10)}
+/* today highlight */
+table.gt th.th-today{color:var(--t2);font-weight:700}
+table.gt td.td-today{outline:1px solid rgba(61,186,120,.4);outline-offset:-2px}
+/* month header */
+.month-hdr{font-family:var(--fm);font-size:8px;font-weight:700;color:var(--amber);
+  letter-spacing:2px;padding:5px 8px;margin:10px 0 5px;
+  background:rgba(245,166,35,.05);border:1px solid rgba(245,166,35,.12);border-radius:4px}
+
+/* ─ BALL ─ */
+.ball{display:inline-flex;align-items:center;justify-content:center;
+  width:22px;height:22px;border-radius:50%;font-size:13px;line-height:1;
+  cursor:pointer;transition:transform .15s,box-shadow .15s;
+  border:1.5px solid transparent;position:relative;z-index:2;
+  -webkit-tap-highlight-color:transparent}
+.ball:active{transform:scale(.88)}
+.ball.wld{background:rgba(245,166,35,.15);border-color:rgba(245,166,35,.4)}
+.ball.arg{background:rgba(116,172,223,.18);border-color:rgba(116,172,223,.55);
+  box-shadow:0 0 8px rgba(116,172,223,.25)}
+.ball-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:2px;width:100%;height:100%}
+/* multiple balls stacked vertically */
+.balls-col{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
+
+/* ─ TOOLTIP ─ */
+.tooltip-overlay{position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.55);
+  backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
+  display:flex;align-items:flex-end;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .2s}
+.tooltip-overlay.show{opacity:1;pointer-events:auto}
+.tooltip-box{background:var(--panel2);border:1px solid var(--brd2);
+  border-radius:16px 16px 0 0;padding:20px 18px calc(env(safe-area-inset-bottom,0px)+18px);
+  width:100%;max-width:460px;
+  transform:translateY(30px);transition:transform .22s ease;max-height:80vh;overflow-y:auto}
+.tooltip-overlay.show .tooltip-box{transform:translateY(0)}
+.tt-handle{width:36px;height:4px;background:var(--brd2);border-radius:2px;
+  margin:0 auto 16px;display:block}
+.tt-phase{font-family:var(--fm);font-size:8px;color:var(--tdim);letter-spacing:2px;margin-bottom:6px}
+.tt-teams{font-size:20px;font-weight:900;color:var(--tbright);line-height:1.2;margin-bottom:10px}
+.tt-teams .hl{color:var(--arg)}
+.tt-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.tt-icon{font-size:14px;flex-shrink:0}
+.tt-val{font-family:var(--fm);font-size:11px;color:var(--text)}
+.tt-val b{color:var(--amber)}
+.tt-guard{display:inline-flex;align-items:center;font-family:var(--fm);font-size:10px;
+  font-weight:700;padding:4px 11px;border-radius:4px;margin-top:6px}
+.tt-close{display:block;width:100%;margin-top:14px;padding:11px;
+  background:rgba(255,255,255,.05);border:1px solid var(--brd);border-radius:8px;
+  color:var(--tdim);font-family:var(--fm);font-size:10px;letter-spacing:1px}
+.tt-close:active{background:rgba(255,255,255,.09)}
+
+/* ─ GUARD LEGEND ─ */
+.g-legend{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:11px}
+.gl{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;
+  border-radius:4px;font-family:var(--fm);font-size:9.5px;font-weight:700;letter-spacing:.5px}
+.turno-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}
+.tc{background:var(--cell);border:1px solid var(--brd);border-radius:7px;padding:9px 11px}
+.tc-n{font-family:var(--fm);font-size:19px;font-weight:800;line-height:1}
+.tc-h{font-family:var(--fm);font-size:8.5px;color:var(--tdim);margin-top:2px}
+.diag-key{font-family:var(--fm);font-size:7.5px;color:var(--tdim);
+  padding:7px 10px;background:var(--cell);border:1px solid var(--brd);
+  border-radius:5px;margin-top:9px;line-height:1.9}
+
+/* ─ CAMINO ─ */
+.camino{background:var(--cell);border:1px solid var(--brd);border-radius:8px;padding:10px 12px;margin-top:10px}
+.camino-hdr{font-family:var(--fm);font-size:7.5px;color:var(--amber);letter-spacing:2px;font-weight:700;margin-bottom:7px}
+.camino-row{display:flex;align-items:flex-start;gap:7px;padding:5px 0;border-bottom:1px solid var(--brd)}
+.camino-row:last-child{border-bottom:none;padding-bottom:0}
+.cr-phase{font-family:var(--fm);font-size:8.5px;font-weight:700;color:var(--arg);width:55px;flex-shrink:0;padding-top:1px}
+.cr-body{flex:1;min-width:0}
+.cr-date{font-family:var(--fm);font-size:8.5px;color:var(--amber)}
+.cr-detail{font-size:10.5px;color:var(--tdim);margin-top:1px}
+.cr-g{flex-shrink:0}
+
+/* ─ FOOTER ─ */
+footer{text-align:center;margin-top:18px;padding-top:13px;border-top:1px solid var(--brd)}
+.fc{font-family:var(--fm);font-size:8px;color:var(--tdim);letter-spacing:1.5px;margin-bottom:3px}
+.fc span{color:var(--amber);font-weight:700}
+</style>
 </head>
-
 <body>
-
-<div class="container">
-
-<div class="topbar">
-<div class="logo">⚽ Mundial <span>Central Puerto</span></div>
-
-<button class="theme-btn" onclick="toggleTheme()">
-🌙 / ☀️ Tema
-</button>
+<!-- TOOLTIP OVERLAY -->
+<div class="tooltip-overlay" id="tt-overlay" onclick="closeTooltip(event)">
+  <div class="tooltip-box" id="tt-box">
+    <span class="tt-handle"></span>
+    <div class="tt-phase" id="tt-phase"></div>
+    <div class="tt-teams" id="tt-teams"></div>
+    <div class="tt-row"><span class="tt-icon">📅</span><span class="tt-val" id="tt-date"></span></div>
+    <div class="tt-row"><span class="tt-icon">🕐</span><span class="tt-val" id="tt-time"></span></div>
+    <div class="tt-row"><span class="tt-icon">🏟</span><span class="tt-val" id="tt-stad"></span></div>
+    <div id="tt-guard"></div>
+    <button class="tt-close" onclick="closeTooltip()">CERRAR</button>
+  </div>
 </div>
 
-<section class="hero">
-<h1>Mundial 2026 + Guardias</h1>
-<p>
-Sistema interactivo de fixture mundialista conectado al diagrama operativo de guardias.
-La aplicación detecta automáticamente qué guardia trabaja durante cada partido.
-</p>
-</section>
+<div class="wrap">
 
-<div class="grid">
+<!-- HEADER -->
+<header>
+  <div class="trophy">⚽🏆⚽</div>
+  <h1>MUNDIAL <em>2026</em></h1>
+  <div class="hsub">CENTRAL PUERTO · PLANTA DE AGUA PN</div>
+  <div class="hrow">
+    <button class="tbtn" onclick="toggleTheme()">☀ CLARO / OSCURO</button>
+  </div>
+</header>
 
-<div class="card">
-<div class="card-title">🔥 Partido destacado</div>
-
-<div class="today-match">
-<div class="big">🇦🇷 Argentina vs Austria</div>
-<div>🕘 14:00 hs</div>
-<div>🏟 Dallas</div>
-<div class="badge argentina">👷 Guardia C</div>
-</div>
-</div>
-
-<div class="card">
-<div class="card-title">🏆 Estado Mundial</div>
-
-<div class="status-list">
-<div class="badge">📅 Fase de grupos</div>
-<div class="badge">⚽ 104 partidos</div>
-<div class="badge">🇦🇷 Argentina clasificada</div>
-</div>
-</div>
-
+<!-- HERO: PRÓXIMOS PARTIDOS -->
+<div class="hero-grid">
+  <div class="hero-card world">
+    <div class="hc-glow"></div>
+    <div class="hc-lbl">⚽ Próximo partido</div>
+    <div id="hp-world-teams" class="hc-teams">—</div>
+    <div class="hc-meta" id="hp-world-meta"></div>
+    <div id="hp-world-guard" class="hc-guard"></div>
+  </div>
+  <div class="hero-card arg">
+    <div class="hc-glow"></div>
+    <div class="hc-lbl">🇦🇷 Próximo Argentina</div>
+    <div id="hp-arg-teams" class="hc-teams">—</div>
+    <div class="hc-meta" id="hp-arg-meta"></div>
+    <div id="hp-arg-guard" class="hc-guard"></div>
+  </div>
 </div>
 
-<div class="card mt">
-<div class="card-title">📅 Fixture completo</div>
-
-<div class="fixture">
-
-<table>
-<thead>
-<tr>
-<th>Fecha</th>
-<th>Hora</th>
-<th>Partido</th>
-<th>Fase</th>
-<th>Guardia</th>
-</tr>
-</thead>
-
-<tbody>
-
-<tr>
-<td>16 JUN</td>
-<td>22:00</td>
-<td>🇦🇷 Argentina vs Argelia</td>
-<td class="phase">Grupos</td>
-<td><span class="guard">Guardia A</span></td>
-</tr>
-
-<tr>
-<td>17 JUN</td>
-<td>17:00</td>
-<td>🏴 Inglaterra vs Croacia</td>
-<td class="phase">Grupos</td>
-<td><span class="guard">Guardia C</span></td>
-</tr>
-
-<tr>
-<td>18 JUN</td>
-<td>22:00</td>
-<td>🇲🇽 México vs Corea</td>
-<td class="phase">Grupos</td>
-<td><span class="guard">Guardia B</span></td>
-</tr>
-
-<tr>
-<td>22 JUN</td>
-<td>14:00</td>
-<td>🇦🇷 Argentina vs Austria</td>
-<td class="phase">Grupos</td>
-<td><span class="guard">Guardia C</span></td>
-</tr>
-
-<tr>
-<td>27 JUN</td>
-<td>23:00</td>
-<td>🇦🇷 Jordania vs Argentina</td>
-<td class="phase">Grupos</td>
-<td><span class="guard">Guardia C</span></td>
-</tr>
-
-<tr>
-<td>19 JUL</td>
-<td>16:00</td>
-<td>🏆 Gran Final</td>
-<td class="phase">Final</td>
-<td><span class="guard">Guardia C</span></td>
-</tr>
-
-</tbody>
-</table>
-
-</div>
+<!-- ARGENTINA -->
+<div class="sec s-arg">
+  <div class="shdr" onclick="toggle('arg')">
+    <span class="si">🇦🇷</span>
+    <span class="st">Argentina</span>
+    <span class="sbadge">Grupo J</span>
+    <span class="sarr" id="arr-arg">▼</span>
+  </div>
+  <div class="sbody open" id="body-arg">
+    <div style="font-family:var(--fm);font-size:8.5px;color:var(--tdim);letter-spacing:1px;margin-bottom:11px;padding:6px 10px;background:rgba(116,172,223,.05);border:1px solid rgba(116,172,223,.16);border-radius:5px">
+      ⭐ Campeón del Mundo · Grupo J: <b style="color:var(--tbright)">Argelia · Austria · Jordania</b>
+    </div>
+    <div id="arg-cards"></div>
+    <div class="camino">
+      <div class="camino-hdr">⚡ POSIBLE CAMINO (si avanza 1°)</div>
+      <div id="camino-rows"></div>
+    </div>
+  </div>
 </div>
 
-<div class="card mt">
-
-<div class="card-title">📊 Diagrama de Guardias</div>
-
-<div class="diagram-grid">
-
-<div></div>
-<div class="dg-head">1</div>
-<div class="dg-head">2</div>
-<div class="dg-head">3</div>
-<div class="dg-head">4</div>
-<div class="dg-head">5</div>
-<div class="dg-head">6</div>
-<div class="dg-head">7</div>
-<div class="dg-head">8</div>
-<div class="dg-head">9</div>
-<div class="dg-head">10</div>
-<div class="dg-head">11</div>
-<div class="dg-head">12</div>
-<div class="dg-head">13</div>
-<div class="dg-head">14</div>
-<div class="dg-head">15</div>
-<div class="dg-head">16</div>
-<div class="dg-head">17</div>
-<div class="dg-head">18</div>
-<div class="dg-head">19</div>
-<div class="dg-head">20</div>
-<div class="dg-head">21</div>
-<div class="dg-head">22</div>
-<div class="dg-head">23</div>
-<div class="dg-head">24</div>
-<div class="dg-head">25</div>
-<div class="dg-head">26</div>
-<div class="dg-head">27</div>
-<div class="dg-head">28</div>
-<div class="dg-head">29</div>
-<div class="dg-head">30</div>
-<div class="dg-head">31</div>
-
-<div class="dg-cell label">Guardia A</div>
-<div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell arg-day">⚽</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell arg-day">⚽</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell arg-day">⚽</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div><div class="dg-cell">2</div>
-
-</div>
+<!-- DIAGRAMA -->
+<div class="sec s-diag">
+  <div class="shdr" onclick="toggle('diag')">
+    <span class="si">📅</span>
+    <span class="st">Diagrama de Guardia</span>
+    <span class="sbadge">Jun–Jul</span>
+    <span class="sarr" id="arr-diag">▼</span>
+  </div>
+  <div class="sbody" id="body-diag">
+    <div class="g-legend" id="g-legend"></div>
+    <div class="scroll-hint">⚽ tocá las pelotas · deslizá para ver más ▷</div>
+    <div id="diag-container"></div>
+    <div class="diag-key">
+      <b style="color:var(--arg)">⚽</b> Argentina &nbsp;·&nbsp;
+      <b style="color:var(--amber)">⚽</b> Otro partido &nbsp;·&nbsp;
+      <span style="background:rgba(91,163,217,.18);padding:1px 5px;border-radius:2px;color:var(--t1)">T1</span> 00–06h &nbsp;
+      <span style="background:rgba(61,186,120,.18);padding:1px 5px;border-radius:2px;color:var(--t2)">T2</span> 06–12h &nbsp;
+      <span style="background:rgba(255,140,66,.18);padding:1px 5px;border-radius:2px;color:var(--t3)">T3</span> 12–18h &nbsp;
+      <span style="background:rgba(176,126,232,.18);padding:1px 5px;border-radius:2px;color:var(--t4)">T4</span> 18–24h &nbsp;
+      <span style="color:#ff4444">F</span> Franco
+    </div>
+  </div>
 </div>
 
-<div class="footer">
-Página creada por <span>Joni de la planta</span> ⚡
+<!-- FIXTURE -->
+<div class="sec s-wld">
+  <div class="shdr" onclick="toggle('wld')">
+    <span class="si">🌍</span>
+    <span class="st">Fixture Completo</span>
+    <span class="sbadge">104 partidos</span>
+    <span class="sarr" id="arr-wld">▼</span>
+  </div>
+  <div class="sbody" id="body-wld">
+    <div class="ptabs" id="ptabs">
+      <button class="pt on" onclick="filterPhase('all')" id="pt-all">TODOS</button>
+      <button class="pt"    onclick="filterPhase('G')"   id="pt-G">GRUPOS</button>
+      <button class="pt"    onclick="filterPhase('16')"  id="pt-16">16AVOS</button>
+      <button class="pt"    onclick="filterPhase('O')"   id="pt-O">OCTAVOS</button>
+      <button class="pt"    onclick="filterPhase('Q')"   id="pt-Q">CUARTOS</button>
+      <button class="pt"    onclick="filterPhase('S')"   id="pt-S">SEMIS</button>
+      <button class="pt"    onclick="filterPhase('F')"   id="pt-F">FINAL</button>
+    </div>
+    <div class="match-list" id="match-list"></div>
+  </div>
 </div>
 
+<!-- LEYENDA -->
+<div class="sec s-leg">
+  <div class="shdr" onclick="toggle('leg')">
+    <span class="si">📖</span>
+    <span class="st">Leyenda</span>
+    <span class="sarr" id="arr-leg">▼</span>
+  </div>
+  <div class="sbody" id="body-leg">
+    <div style="font-family:var(--fm);font-size:8px;color:var(--amber);letter-spacing:2px;font-weight:700;margin-bottom:7px">GUARDIAS</div>
+    <div class="g-legend" id="g-legend-2"></div>
+    <div style="font-family:var(--fm);font-size:8px;color:var(--amber);letter-spacing:2px;font-weight:700;margin:11px 0 7px">TURNOS</div>
+    <div class="turno-grid">
+      <div class="tc"><div class="tc-n" style="color:var(--t1)">T1</div><div class="tc-h">00:00 – 05:59</div></div>
+      <div class="tc"><div class="tc-n" style="color:var(--t2)">T2</div><div class="tc-h">06:00 – 11:59</div></div>
+      <div class="tc"><div class="tc-n" style="color:var(--t3)">T3</div><div class="tc-h">12:00 – 17:59</div></div>
+      <div class="tc"><div class="tc-n" style="color:var(--t4)">T4</div><div class="tc-h">18:00 – 23:59</div></div>
+    </div>
+  </div>
 </div>
 
-<script src="app.js"></script>
+<footer>
+  <div class="fc">MUNDIAL 2026 · CENTRAL PUERTO · PLANTA DE AGUA PN</div>
+  <div class="fc" style="margin-top:4px">Página creada por <span>Joni de la planta</span></div>
+</footer>
+</div><!-- /wrap -->
 
+<script>
+// ══ ROTATION ══════════════════════════════════════════════════════
+const REF=new Date('2025-12-01T12:00:00');
+const POS={A:1,B:3,C:5,D:6,E:0};
+const CYC={
+  A:[[2,6],['F',1],[3,6],['F',1],[4,6],['F',2],[1,6],['F',2]],
+  B:[[1,6],['F',2],[2,6],['F',1],[3,6],['F',1],[4,6],['F',2]],
+  C:[[4,6],['F',2],[1,6],['F',2],[2,6],['F',1],[3,6],['F',1]],
+  D:[[3,6],['F',1],[4,6],['F',2],[1,6],['F',2],[2,6],['F',1]],
+  E:[[3,6],['F',1],[4,6],['F',2],[1,6],['F',2],[2,6],['F',1]],
+};
+function turno(g,ds){
+  const diff=Math.round((new Date(ds+'T12:00:00')-REF)/86400000);
+  let cp=((POS[g]+diff)%30+30)%30,p=0;
+  for(const[st,cnt]of CYC[g]){if(cp<p+cnt)return st;p+=cnt;}
+  return'F';
+}
+
+// ══ GUARDS ════════════════════════════════════════════════════════
+const GUARDS=[
+  {id:'A',color:'#f5a623'},
+  {id:'B',color:'#3dba78'},
+  {id:'C',color:'#4a9eda'},
+  {id:'D',color:'#b07ee8'},
+  {id:'E',color:'#e05252'},
+];
+
+// ══ UTILS ════════════════════════════════════════════════════════
+const DOW=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+const MES=['','ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+function dk(y,m,d){return`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
+function fmtD(ds){
+  const[y,m,d]=ds.split('-').map(Number);
+  const dw=new Date(y,m-1,d).getDay();
+  return`${DOW[dw]} ${d} ${MES[m]}`;
+}
+function todayStr(){const n=new Date();return dk(n.getFullYear(),n.getMonth()+1,n.getDate());}
+
+// turno from time string
+function timeToTurno(t){
+  if(!t||t==='TBD')return null;
+  const h=parseInt(t.split(':')[0]);
+  return h<6?1:h<12?2:h<18?3:4;
+}
+function dutyGuards(ds,t){
+  const tn=timeToTurno(t);if(!tn)return[];
+  return GUARDS.filter(g=>turno(g.id,ds)===tn);
+}
+function guardPills(ds,t,small){
+  const gs=dutyGuards(ds,t);
+  if(!gs.length)return'<span style="font-family:var(--fm);font-size:8.5px;color:var(--tdim)">—</span>';
+  const sz=small?'8px':'9.5px';
+  return gs.map(g=>`<span class="gp" style="background:${g.color}16;border:1px solid ${g.color}40;color:${g.color};font-size:${sz}">G${g.id}</span>`).join(' ');
+}
+
+// ══ MATCHES DATA ════════════════════════════════════════════════
+// Format: {d, t, m, c, st (stadium), p (phase), arg}
+const M=[
+  {d:'2026-06-11',t:'16:00',m:'México vs Sudáfrica',c:'Ciudad de México',st:'Estadio Azteca',p:'G'},
+  {d:'2026-06-11',t:'23:00',m:'Corea del Sur vs Rep. Checa',c:'Guadalajara',st:'Estadio Akron',p:'G'},
+  {d:'2026-06-12',t:'16:00',m:'Canadá vs Bosnia y Herz.',c:'Toronto',st:'BMO Field',p:'G'},
+  {d:'2026-06-12',t:'22:00',m:'EE.UU. vs Paraguay',c:'Los Ángeles',st:'SoFi Stadium',p:'G'},
+  {d:'2026-06-13',t:'16:00',m:'Qatar vs Suiza',c:'San Francisco',st:'Levis Stadium',p:'G'},
+  {d:'2026-06-13',t:'19:00',m:'Brasil vs Marruecos',c:'Nueva Jersey',st:'MetLife Stadium',p:'G'},
+  {d:'2026-06-13',t:'22:00',m:'Haití vs Escocia',c:'Boston',st:'Gillette Stadium',p:'G'},
+  {d:'2026-06-14',t:'01:00',m:'Australia vs Turquía',c:'Vancouver',st:'BC Place',p:'G'},
+  {d:'2026-06-14',t:'14:00',m:'Alemania vs Curazao',c:'Houston',st:'NRG Stadium',p:'G'},
+  {d:'2026-06-14',t:'17:00',m:'Países Bajos vs Japón',c:'Dallas',st:'AT&T Stadium',p:'G'},
+  {d:'2026-06-14',t:'20:00',m:'Costa de Marfil vs Ecuador',c:'Philadelphia',st:'Lincoln Financial Field',p:'G'},
+  {d:'2026-06-14',t:'23:00',m:'Suecia vs Túnez',c:'Monterrey',st:'Estadio BBVA',p:'G'},
+  {d:'2026-06-15',t:'13:00',m:'España vs Cabo Verde',c:'Atlanta',st:'Mercedes-Benz Stadium',p:'G'},
+  {d:'2026-06-15',t:'16:00',m:'Bélgica vs Egipto',c:'Seattle',st:'Lumen Field',p:'G'},
+  {d:'2026-06-15',t:'19:00',m:'Arabia Saudita vs Uruguay',c:'Miami',st:'Hard Rock Stadium',p:'G'},
+  {d:'2026-06-15',t:'22:00',m:'Irán vs Nueva Zelanda',c:'Los Ángeles',st:'Rose Bowl',p:'G'},
+  {d:'2026-06-16',t:'16:00',m:'Francia vs Senegal',c:'Nueva Jersey',st:'MetLife Stadium',p:'G'},
+  {d:'2026-06-16',t:'19:00',m:'Irak vs Noruega',c:'Boston',st:'Gillette Stadium',p:'G'},
+  {d:'2026-06-16',t:'22:00',m:'Argentina vs Argelia',c:'Kansas City',st:'Arrowhead Stadium',p:'G',arg:1},
+  {d:'2026-06-17',t:'01:00',m:'Austria vs Jordania',c:'San Francisco',st:'Levis Stadium',p:'G'},
+  {d:'2026-06-17',t:'14:00',m:'Portugal vs RD Congo',c:'Houston',st:'NRG Stadium',p:'G'},
+  {d:'2026-06-17',t:'17:00',m:'Inglaterra vs Croacia',c:'Dallas',st:'AT&T Stadium',p:'G'},
+  {d:'2026-06-17',t:'20:00',m:'Ghana vs Panamá',c:'Toronto',st:'BMO Field',p:'G'},
+  {d:'2026-06-17',t:'23:00',m:'Uzbekistán vs Colombia',c:'Ciudad de México',st:'Estadio Azteca',p:'G'},
+  {d:'2026-06-18',t:'13:00',m:'Rep. Checa vs Sudáfrica',c:'Atlanta',st:'Mercedes-Benz Stadium',p:'G'},
+  {d:'2026-06-18',t:'16:00',m:'Suiza vs Bosnia y Herz.',c:'Los Ángeles',st:'SoFi Stadium',p:'G'},
+  {d:'2026-06-18',t:'19:00',m:'Canadá vs Qatar',c:'Vancouver',st:'BC Place',p:'G'},
+  {d:'2026-06-18',t:'22:00',m:'México vs Corea del Sur',c:'Guadalajara',st:'Estadio Akron',p:'G'},
+  {d:'2026-06-19',t:'16:00',m:'EE.UU. vs Australia',c:'Seattle',st:'Lumen Field',p:'G'},
+  {d:'2026-06-19',t:'19:00',m:'Escocia vs Marruecos',c:'Boston',st:'Gillette Stadium',p:'G'},
+  {d:'2026-06-19',t:'21:30',m:'Brasil vs Haití',c:'Philadelphia',st:'Lincoln Financial Field',p:'G'},
+  {d:'2026-06-20',t:'00:00',m:'Turquía vs Paraguay',c:'San Francisco',st:'Levis Stadium',p:'G'},
+  {d:'2026-06-20',t:'14:00',m:'Países Bajos vs Suecia',c:'Houston',st:'NRG Stadium',p:'G'},
+  {d:'2026-06-20',t:'17:00',m:'Alemania vs Costa de Marfil',c:'Toronto',st:'BMO Field',p:'G'},
+  {d:'2026-06-20',t:'23:00',m:'Ecuador vs Curazao',c:'Kansas City',st:'Arrowhead Stadium',p:'G'},
+  {d:'2026-06-21',t:'01:00',m:'Túnez vs Japón',c:'Monterrey',st:'Estadio BBVA',p:'G'},
+  {d:'2026-06-21',t:'13:00',m:'España vs Arabia Saudita',c:'Atlanta',st:'Mercedes-Benz Stadium',p:'G'},
+  {d:'2026-06-21',t:'16:00',m:'Bélgica vs Irán',c:'Los Ángeles',st:'Rose Bowl',p:'G'},
+  {d:'2026-06-21',t:'19:00',m:'Uruguay vs Cabo Verde',c:'Miami',st:'Hard Rock Stadium',p:'G'},
+  {d:'2026-06-21',t:'22:00',m:'Nueva Zelanda vs Egipto',c:'Vancouver',st:'BC Place',p:'G'},
+  {d:'2026-06-22',t:'14:00',m:'Argentina vs Austria',c:'Dallas',st:'AT&T Stadium',p:'G',arg:1},
+  {d:'2026-06-22',t:'18:00',m:'Francia vs Irak',c:'Philadelphia',st:'Lincoln Financial Field',p:'G'},
+  {d:'2026-06-22',t:'21:00',m:'Noruega vs Senegal',c:'Nueva Jersey',st:'MetLife Stadium',p:'G'},
+  {d:'2026-06-23',t:'00:00',m:'Jordania vs Argelia',c:'San Francisco',st:'Levis Stadium',p:'G'},
+  {d:'2026-06-23',t:'14:00',m:'Portugal vs Uzbekistán',c:'Houston',st:'NRG Stadium',p:'G'},
+  {d:'2026-06-23',t:'17:00',m:'Inglaterra vs Ghana',c:'Boston',st:'Gillette Stadium',p:'G'},
+  {d:'2026-06-23',t:'20:00',m:'Panamá vs Croacia',c:'Toronto',st:'BMO Field',p:'G'},
+  {d:'2026-06-23',t:'23:00',m:'Colombia vs RD Congo',c:'Guadalajara',st:'Estadio Akron',p:'G'},
+  {d:'2026-06-24',t:'16:00',m:'Suiza vs Canadá',c:'Vancouver',st:'BC Place',p:'G'},
+  {d:'2026-06-24',t:'16:00',m:'Bosnia y Herz. vs Qatar',c:'Seattle',st:'Lumen Field',p:'G'},
+  {d:'2026-06-24',t:'19:00',m:'Marruecos vs Haití',c:'Atlanta',st:'Mercedes-Benz Stadium',p:'G'},
+  {d:'2026-06-24',t:'19:00',m:'Brasil vs Escocia',c:'Miami',st:'Hard Rock Stadium',p:'G'},
+  {d:'2026-06-24',t:'22:00',m:'Sudáfrica vs Corea del Sur',c:'Monterrey',st:'Estadio BBVA',p:'G'},
+  {d:'2026-06-24',t:'22:00',m:'Rep. Checa vs México',c:'Ciudad de México',st:'Estadio Azteca',p:'G'},
+  {d:'2026-06-25',t:'17:00',m:'Curazao vs C.de Marfil',c:'Philadelphia',st:'Lincoln Financial Field',p:'G'},
+  {d:'2026-06-25',t:'17:00',m:'Ecuador vs Alemania',c:'Nueva Jersey',st:'MetLife Stadium',p:'G'},
+  {d:'2026-06-25',t:'20:00',m:'Japón vs Suecia',c:'Dallas',st:'AT&T Stadium',p:'G'},
+  {d:'2026-06-25',t:'20:00',m:'Túnez vs Países Bajos',c:'Kansas City',st:'Arrowhead Stadium',p:'G'},
+  {d:'2026-06-25',t:'23:00',m:'Paraguay vs Australia',c:'San Francisco',st:'Levis Stadium',p:'G'},
+  {d:'2026-06-25',t:'23:00',m:'Turquía vs EE.UU.',c:'Los Ángeles',st:'SoFi Stadium',p:'G'},
+  {d:'2026-06-26',t:'16:00',m:'Noruega vs Francia',c:'Boston',st:'Gillette Stadium',p:'G'},
+  {d:'2026-06-26',t:'16:00',m:'Senegal vs Irak',c:'Toronto',st:'BMO Field',p:'G'},
+  {d:'2026-06-26',t:'21:00',m:'Cabo Verde vs Arabia Saudita',c:'Houston',st:'NRG Stadium',p:'G'},
+  {d:'2026-06-26',t:'21:00',m:'Uruguay vs España',c:'Guadalajara',st:'Estadio Akron',p:'G'},
+  {d:'2026-06-27',t:'00:00',m:'Egipto vs Irán',c:'Seattle',st:'Lumen Field',p:'G'},
+  {d:'2026-06-27',t:'00:00',m:'Nueva Zelanda vs Bélgica',c:'Vancouver',st:'BC Place',p:'G'},
+  {d:'2026-06-27',t:'18:00',m:'Croacia vs Ghana',c:'Philadelphia',st:'Lincoln Financial Field',p:'G'},
+  {d:'2026-06-27',t:'18:00',m:'Panamá vs Inglaterra',c:'Nueva Jersey',st:'MetLife Stadium',p:'G'},
+  {d:'2026-06-27',t:'20:30',m:'Colombia vs Portugal',c:'Miami',st:'Hard Rock Stadium',p:'G'},
+  {d:'2026-06-27',t:'20:30',m:'RD Congo vs Uzbekistán',c:'Atlanta',st:'Mercedes-Benz Stadium',p:'G'},
+  {d:'2026-06-27',t:'23:00',m:'Argelia vs Austria',c:'Kansas City',st:'Arrowhead Stadium',p:'G'},
+  {d:'2026-06-27',t:'23:00',m:'Jordania vs Argentina',c:'Dallas',st:'AT&T Stadium',p:'G',arg:1},
+  // 16avos
+  {d:'2026-06-28',t:'TBD',m:'16avos — P73',c:'Los Ángeles',st:'SoFi Stadium',p:'16'},
+  {d:'2026-06-29',t:'TBD',m:'16avos — P74',c:'Boston',st:'Gillette Stadium',p:'16'},
+  {d:'2026-06-29',t:'TBD',m:'16avos — P75',c:'Monterrey',st:'Estadio BBVA',p:'16'},
+  {d:'2026-06-29',t:'TBD',m:'16avos — P76',c:'Houston',st:'NRG Stadium',p:'16'},
+  {d:'2026-06-30',t:'TBD',m:'16avos — P77',c:'Nueva Jersey',st:'MetLife Stadium',p:'16'},
+  {d:'2026-06-30',t:'TBD',m:'16avos — P78',c:'Dallas',st:'AT&T Stadium',p:'16'},
+  {d:'2026-06-30',t:'TBD',m:'16avos — P79',c:'Ciudad de México',st:'Estadio Azteca',p:'16'},
+  {d:'2026-07-01',t:'TBD',m:'16avos — P80',c:'Atlanta',st:'Mercedes-Benz Stadium',p:'16'},
+  {d:'2026-07-01',t:'TBD',m:'16avos — P81',c:'San Francisco',st:'Levis Stadium',p:'16'},
+  {d:'2026-07-01',t:'TBD',m:'16avos — P82',c:'Seattle',st:'Lumen Field',p:'16'},
+  {d:'2026-07-02',t:'TBD',m:'16avos — P83',c:'Toronto',st:'BMO Field',p:'16'},
+  {d:'2026-07-02',t:'TBD',m:'16avos — P84',c:'Los Ángeles',st:'Rose Bowl',p:'16'},
+  {d:'2026-07-02',t:'TBD',m:'16avos — P85',c:'Vancouver',st:'BC Place',p:'16'},
+  {d:'2026-07-03',t:'TBD',m:'16avos — P86 (ARG posible)',c:'Miami',st:'Hard Rock Stadium',p:'16',arg:1},
+  {d:'2026-07-03',t:'TBD',m:'16avos — P87',c:'Kansas City',st:'Arrowhead Stadium',p:'16'},
+  {d:'2026-07-03',t:'TBD',m:'16avos — P88',c:'Dallas',st:'AT&T Stadium',p:'16'},
+  // Octavos
+  {d:'2026-07-04',t:'TBD',m:'Octavos — P89',c:'Philadelphia',st:'Lincoln Financial Field',p:'O'},
+  {d:'2026-07-04',t:'TBD',m:'Octavos — P90',c:'Houston',st:'NRG Stadium',p:'O'},
+  {d:'2026-07-05',t:'TBD',m:'Octavos — P91',c:'Nueva Jersey',st:'MetLife Stadium',p:'O'},
+  {d:'2026-07-05',t:'TBD',m:'Octavos — P92',c:'Ciudad de México',st:'Estadio Azteca',p:'O'},
+  {d:'2026-07-06',t:'TBD',m:'Octavos — P93',c:'Dallas',st:'AT&T Stadium',p:'O'},
+  {d:'2026-07-06',t:'TBD',m:'Octavos — P94',c:'Seattle',st:'Lumen Field',p:'O'},
+  {d:'2026-07-07',t:'TBD',m:'Octavos — P95 (ARG posible)',c:'Atlanta',st:'Mercedes-Benz Stadium',p:'O',arg:1},
+  {d:'2026-07-07',t:'TBD',m:'Octavos — P96',c:'Vancouver',st:'BC Place',p:'O'},
+  // Cuartos
+  {d:'2026-07-09',t:'TBD',m:'Cuartos — P97',c:'Boston',st:'Gillette Stadium',p:'Q'},
+  {d:'2026-07-10',t:'TBD',m:'Cuartos — P98',c:'Los Ángeles',st:'SoFi Stadium',p:'Q'},
+  {d:'2026-07-11',t:'TBD',m:'Cuartos — P99',c:'Miami',st:'Hard Rock Stadium',p:'Q'},
+  {d:'2026-07-11',t:'TBD',m:'Cuartos — P100 (ARG posible)',c:'Kansas City',st:'Arrowhead Stadium',p:'Q',arg:1},
+  // Semis
+  {d:'2026-07-14',t:'TBD',m:'Semifinal (ARG posible)',c:'Dallas',st:'AT&T Stadium',p:'S',arg:1},
+  {d:'2026-07-15',t:'TBD',m:'Semifinal',c:'Atlanta',st:'Mercedes-Benz Stadium',p:'S'},
+  // Final
+  {d:'2026-07-18',t:'TBD',m:'3° Puesto',c:'Miami',st:'Hard Rock Stadium',p:'F'},
+  {d:'2026-07-19',t:'16:00',m:'🏆 GRAN FINAL',c:'Nueva York/NJ',st:'MetLife Stadium',p:'F'},
+];
+
+// ══ ARG DATES ════════════════════════════════════════════════════
+const ARG_DS=new Set(M.filter(x=>x.arg).map(x=>x.d));
+
+// Group matches by date
+const BY_DATE={};
+M.forEach(x=>{(BY_DATE[x.d]||(BY_DATE[x.d]=[])).push(x);});
+
+// ══ PHASE LABELS ═════════════════════════════════════════════════
+const PHL={G:'FASE DE GRUPOS',16:'16AVOS DE FINAL',O:'OCTAVOS DE FINAL',Q:'CUARTOS DE FINAL',S:'SEMIFINALES',F:'FINAL'};
+
+// ══ TOOLTIP ══════════════════════════════════════════════════════
+function showTooltip(match){
+  const ov=document.getElementById('tt-overlay');
+  const gs=dutyGuards(match.d,match.t);
+  const isArg=!!match.arg;
+  document.getElementById('tt-phase').textContent=PHL[match.p]||'';
+  document.getElementById('tt-teams').innerHTML=isArg
+    ? match.m.replace('Argentina','<span class="hl">Argentina</span>')
+    : match.m;
+  document.getElementById('tt-date').innerHTML=`<b>${fmtD(match.d)}</b>`;
+  document.getElementById('tt-time').innerHTML=match.t==='TBD'
+    ? 'Horario a confirmar'
+    : `<b>${match.t} hs</b> (Buenos Aires)`;
+  document.getElementById('tt-stad').innerHTML=`<b>${match.st||match.c}</b> · ${match.c}`;
+  const gg=document.getElementById('tt-guard');
+  if(gs.length){
+    const g=gs[0];
+    gg.innerHTML=`<span class="tt-guard" style="background:${g.color}18;border:1px solid ${g.color}44;color:${g.color}">
+      Guardia ${g.id} en turno</span>`;
+  } else {
+    gg.innerHTML='';
+  }
+  ov.classList.add('show');
+}
+function closeTooltip(e){
+  if(e&&e.target!==document.getElementById('tt-overlay'))return;
+  document.getElementById('tt-overlay').classList.remove('show');
+}
+
+// ══ BUILD HERO ═══════════════════════════════════════════════════
+function buildHero(){
+  const tod=todayStr();
+  const upcoming=M.filter(x=>x.d>=tod&&x.t!=='TBD');
+  const nextWorld=upcoming[0];
+  const nextArg=upcoming.find(x=>x.arg);
+
+  function fillHero(prefix,match,isArg){
+    if(!match)return;
+    const gs=dutyGuards(match.d,match.t);
+    document.getElementById(`hp-${prefix}-teams`).innerHTML=isArg
+      ? match.m.replace('Argentina','<span class="hl">Argentina</span>')
+      : match.m;
+    document.getElementById(`hp-${prefix}-meta`).innerHTML=
+      `<div class="hc-row">📅 <b>${fmtD(match.d)}</b></div>
+       <div class="hc-row">🕐 <b>${match.t} hs</b> BsAs</div>
+       <div class="hc-row">🏟 ${match.st||match.c}</div>`;
+    const gg=document.getElementById(`hp-${prefix}-guard`);
+    if(gs.length){
+      const g=gs[0];
+      gg.innerHTML=`Guardia ${g.id} en turno`;
+      gg.style.cssText=`background:${g.color}18;border:1px solid ${g.color}44;color:${g.color}`;
+    }
+  }
+  fillHero('world',nextWorld,nextWorld?.arg);
+  fillHero('arg',nextArg,true);
+}
+
+// ══ BUILD ARG SECTION ════════════════════════════════════════════
+const ARG_MATCHES=[
+  {id:'1',d:'2026-06-16',t:'22:00',m:'Argentina vs Argelia',opp:'Argelia',c:'Kansas City',st:'Arrowhead Stadium',phase:'Grupo J · Partido 1'},
+  {id:'2',d:'2026-06-22',t:'14:00',m:'Argentina vs Austria',opp:'Austria',c:'Dallas',st:'AT&T Stadium',phase:'Grupo J · Partido 2'},
+  {id:'3',d:'2026-06-27',t:'23:00',m:'Jordania vs Argentina',opp:'Jordania',c:'Dallas',st:'AT&T Stadium',phase:'Grupo J · Partido 3'},
+];
+const CAMINO=[
+  {phase:'16AVOS',d:'2026-07-03',t:'TBD',dt:'3 Jul · Miami',detail:'vs 2° Grupo H (España/Uruguay/Arabia S./Cabo Verde)'},
+  {phase:'OCTAVOS',d:'2026-07-07',t:'TBD',dt:'7 Jul · Atlanta',detail:'Cruce TBD'},
+  {phase:'CUARTOS',d:'2026-07-11',t:'TBD',dt:'11 Jul · Kansas City',detail:'Cruce TBD'},
+  {phase:'SEMI',d:'2026-07-14',t:'TBD',dt:'14 Jul · Dallas',detail:'Cruce TBD'},
+  {phase:'🏆 FINAL',d:'2026-07-19',t:'16:00',dt:'19 Jul · Nueva York/NJ',detail:'MetLife Stadium'},
+];
+function buildArgSection(){
+  const tod=todayStr();
+  let marked=false;
+  let html='';
+  ARG_MATCHES.forEach(({id,d,t,m,opp,c,st,phase})=>{
+    const gs=dutyGuards(d,t);
+    const isPast=d<tod;
+    const isNext=!marked&&d>=tod;
+    if(isNext)marked=true;
+    const gpHtml=gs.length
+      ? gs.map(g=>`<span class="b-g" style="background:${g.color}16;border:1px solid ${g.color}40;color:${g.color}">G${g.id}</span>`).join(' ')
+      : '<span class="b-g" style="background:rgba(255,255,255,.04);border:1px solid var(--brd);color:var(--tdim)">—</span>';
+    const mTeams=m.replace('Argentina','<span class="hl">Argentina</span>');
+    html+=`<div class="am${isNext?' next':''}${isPast?' past':''}">
+      ${isNext?'<div class="next-tag">PRÓXIMO</div>':''}
+      <div class="am-phase">${phase}</div>
+      <div class="am-teams">${mTeams}</div>
+      <div class="am-meta">
+        <span class="badge b-date">${fmtD(d)}</span>
+        <span class="badge b-time">${t} hs</span>
+        <span class="badge b-city">${c}</span>
+        ${gpHtml}
+      </div>
+    </div>`;
+  });
+  document.getElementById('arg-cards').innerHTML=html;
+  // Camino
+  let chtml='';
+  CAMINO.forEach(({phase,d,t,dt,detail})=>{
+    const gp=guardPills(d,t,true);
+    chtml+=`<div class="camino-row">
+      <div class="cr-phase">${phase}</div>
+      <div class="cr-body">
+        <div class="cr-date">${dt}</div>
+        <div class="cr-detail">${detail}</div>
+      </div>
+      <div class="cr-g">${gp}</div>
+    </div>`;
+  });
+  document.getElementById('camino-rows').innerHTML=chtml;
+}
+
+// ══ BUILD DIAGRAM ════════════════════════════════════════════════
+function buildDiagram(){
+  const tod=todayStr();
+  let html='';
+  [[2026,6,'JUNIO 2026'],[2026,7,'JULIO 2026']].forEach(([y,mo,lbl])=>{
+    const last=new Date(y,mo,0).getDate();
+    const days=[];
+    for(let d=1;d<=last;d++) days.push(dk(y,mo,d));
+
+    html+=`<div class="month-hdr">⚽ ${lbl}</div>
+    <div class="diag-outer"><table class="gt"><thead><tr>
+    <th class="gn">GUARDIA</th>`;
+
+    days.forEach(ds=>{
+      const dn=parseInt(ds.split('-')[2]);
+      const dobj=new Date(ds+'T12:00:00');
+      const dw=['L','M','X','J','V','S','D'][dobj.getDay()===0?6:dobj.getDay()-1];
+      const isToday=ds===tod;
+      let cls='';
+      if(isToday)cls='th-today';
+      html+=`<th class="${cls}">${dn}<br>${dw}</th>`;
+    });
+    html+='</tr></thead><tbody>';
+
+    GUARDS.forEach(g=>{
+      html+=`<tr><td class="gn" style="color:${g.color};border-left:3px solid ${g.color}40">G${g.id}</td>`;
+      days.forEach(ds=>{
+        const t=turno(g.id,ds);
+        const isToday=ds===tod;
+        let cls=t==='F'?'tf':`t${t}`;
+        if(isToday)cls+=' td-today';
+
+        // Find matches on this day that fall in this guard's turno
+        const dayMatches=BY_DATE[ds]||[];
+        const guardTurno=t==='F'?null:t;
+
+        // Matches whose time falls in this turno
+        const matchesHere=dayMatches.filter(mm=>{
+          if(mm.t==='TBD') return false;
+          return timeToTurno(mm.t)===guardTurno;
+        });
+
+        let innerHtml='';
+        if(matchesHere.length>0){
+          // Show turno letter dimly if no ball, else just balls
+          const ballsHtml=matchesHere.map(mm=>{
+            const isArg=!!mm.arg;
+            const ballClass=isArg?'ball arg':'ball wld';
+            const ballEmoji=isArg?'⚽':'⚽';
+            // encode match data as JSON in data attr
+            const idx=M.indexOf(mm);
+            return`<div class="${ballClass}" onclick="showMatch(${idx})" title="${mm.m}">${ballEmoji}</div>`;
+          }).join('');
+          innerHtml=`<div class="balls-col">${ballsHtml}</div>`;
+        } else {
+          // just show turno/F label
+          const tc=t==='F'?'#ff444488':`var(--t${t})`;
+          innerHtml=`<span style="font-family:var(--fm);font-size:9px;font-weight:700;color:${tc};opacity:.55">${t==='F'?'F':t}</span>`;
+        }
+
+        html+=`<td class="${cls}">${innerHtml}</td>`;
+      });
+      html+='</tr>';
+    });
+    html+='</tbody></table></div>';
+  });
+  document.getElementById('diag-container').innerHTML=html;
+}
+function showMatch(idx){showTooltip(M[idx]);}
+
+// ══ BUILD GUARD LEGENDS ══════════════════════════════════════════
+function buildLegends(){
+  ['g-legend','g-legend-2'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    el.innerHTML=GUARDS.map(g=>
+      `<div class="gl" style="background:${g.color}14;border:1px solid ${g.color}30;color:${g.color}">G${g.id}</div>`
+    ).join('');
+  });
+}
+
+// ══ BUILD MATCH LIST ════════════════════════════════════════════
+let curPhase='all';
+function filterPhase(p){
+  curPhase=p;
+  document.querySelectorAll('.pt').forEach(b=>b.classList.remove('on'));
+  document.getElementById('pt-'+p)?.classList.add('on');
+  buildMatchList();
+}
+function buildMatchList(){
+  const list=curPhase==='all'?M:M.filter(x=>x.p===curPhase);
+  let lp=null,html='';
+  list.forEach(x=>{
+    if(x.p!==lp){
+      html+=`<div class="ph-hdr">— ${PHL[x.p]||x.p} —</div>`;
+      lp=x.p;
+    }
+    const isArg=!!x.arg;
+    const gp=guardPills(x.d,x.t,true);
+    html+=`<div class="mc${isArg?' arg-row':''}" onclick="showTooltip(${JSON.stringify(x).replace(/"/g,'&quot;')})">
+      <div class="mc-time">
+        <div class="mc-tv">${x.t==='TBD'?'—':x.t}</div>
+        <div class="mc-td">${fmtD(x.d)}</div>
+      </div>
+      <div class="mc-body">
+        <div class="mc-name${isArg?' arg':''}">${x.m}</div>
+        <div class="mc-city">${x.c} · ${x.st||''}</div>
+      </div>
+      <div class="mc-right">${gp}</div>
+    </div>`;
+  });
+  document.getElementById('match-list').innerHTML=html;
+}
+
+// ══ TOGGLE ═══════════════════════════════════════════════════════
+function toggle(id){
+  const b=document.getElementById('body-'+id);
+  const a=document.getElementById('arr-'+id);
+  if(!b)return;
+  const open=b.classList.toggle('open');
+  if(a)a.textContent=open?'▲':'▼';
+}
+function toggleTheme(){
+  const l=document.body.classList.toggle('light');
+  localStorage.setItem('m26-theme',l?'light':'dark');
+}
+
+// ══ INIT ══════════════════════════════════════════════════════════
+(function(){
+  if(localStorage.getItem('m26-theme')==='light')document.body.classList.add('light');
+  buildLegends();
+  buildHero();
+  buildArgSection();
+  buildDiagram();
+  buildMatchList();
+  // Open diag by default on desktop, closed on mobile
+  if(window.innerWidth>600)toggle('diag');
+})();
+</script>
 </body>
 </html>
