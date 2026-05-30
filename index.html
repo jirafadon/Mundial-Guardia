@@ -252,6 +252,16 @@ table.gt td.td-today{outline:1px solid rgba(61,186,120,.45);outline-offset:-2px}
   min-width:40px;text-align:center;flex-shrink:0}
 .res-score.live{color:#3dba78}
 .res-meta{font-family:var(--fm);font-size:8px;color:var(--tdim);margin-top:4px}
+.res-cd-lbl{font-family:var(--fm);font-size:8px;color:var(--tdim);letter-spacing:2px;margin-bottom:14px}
+.res-cd-grid{display:flex;justify-content:center;gap:10px;margin-bottom:14px}
+.res-cd-unit{display:flex;flex-direction:column;align-items:center;gap:4px}
+.res-cd-num{font-family:var(--fm);font-size:28px;font-weight:700;color:var(--amber);
+  background:var(--cell);border:1px solid var(--brd);border-radius:7px;
+  min-width:52px;padding:8px 6px;line-height:1;text-align:center}
+.res-cd-tag{font-family:var(--fm);font-size:7px;color:var(--tdim);letter-spacing:1.5px}
+.res-cd-sub{font-family:var(--fm);font-size:8.5px;color:var(--tdim);margin-bottom:10px}
+.res-cd-sub b{color:var(--tbright)}
+.res-countdown{text-align:center;padding:18px 10px}
 .res-loading{font-family:var(--fm);font-size:9px;color:var(--tdim);text-align:center;padding:20px;letter-spacing:1px}
 .res-err{font-family:var(--fm);font-size:9px;color:#e05252;text-align:center;padding:16px}
 
@@ -280,8 +290,8 @@ footer{text-align:center;margin-top:18px;padding-top:12px;border-top:1px solid v
 <div class="wrap">
 <header>
   <div class="trophy">⚽🏆⚽</div>
-  <h1>GUARDIA <em>PUERTO NUEVO</em></h1>
-  <div class="hsub">CENTRAL PUERTO PN · MUNDIAL 2026</div>
+  <h1>MUNDIAL <em>2026</em></h1>
+  <div class="hsub">GUARDIA PUERTO NUEVO · CENTRAL PUERTO PN</div>
   <div class="hrow">
     <button class="tbtn" onclick="toggleTheme()">☀ CLARO / OSCURO</button>
   </div>
@@ -590,8 +600,20 @@ const GRP_HDR={
 const PHL={G:'FASE DE GRUPOS','16':'16AVOS DE FINAL',O:'OCTAVOS DE FINAL',Q:'CUARTOS DE FINAL',S:'SEMIFINALES',F:'FINAL'};
 
 // ── TOOLTIP ───────────────────────────────────────────────────────
-function showTT(idx){
-  const x=M[idx];
+function showTT(idxOrArr){
+  const idxs=Array.isArray(idxOrArr)?idxOrArr:[idxOrArr];
+  const matches=idxs.map(i=>M[i]).filter(Boolean);
+  if(!matches.length)return;
+
+  if(matches.length===1){
+    renderTTSingle(matches[0]);
+  } else {
+    renderTTMulti(matches);
+  }
+  document.getElementById('tt-ov').classList.add('show');
+}
+
+function renderTTSingle(x){
   const gs=dutyG(x.d,x.t);
   const isArg=!!x.arg;
   document.getElementById('tt-phase').textContent=PHL[x.p]||'';
@@ -607,7 +629,33 @@ function showTT(idx){
   if(gs.length){const g=gs[0];
     gg.innerHTML='<span class="tt-guard" style="background:'+g.c+'18;border:1px solid '+g.c+'44;color:'+g.c+'">Guardia '+g.id+' en turno</span>';
   } else gg.innerHTML='';
-  document.getElementById('tt-ov').classList.add('show');
+}
+
+function renderTTMulti(matches){
+  const x0=matches[0];
+  const gs=dutyG(x0.d,x0.t);
+  document.getElementById('tt-phase').textContent=fmtD(x0.d)+' · '+matches.length+' partidos';
+  // build list of matches
+  let html='';
+  matches.forEach(x=>{
+    const isArg=!!x.arg;
+    const teams=isArg?x.m.replace('Argentina','<span class="hl">Argentina</span>'):x.m;
+    html+='<div style="padding:7px 0;border-bottom:1px solid var(--brd);last-child:border-none">'+
+      '<div style="font-size:13px;font-weight:800;color:'+(isArg?'var(--arg)':'var(--tbright)')+'">'+teams+'</div>'+
+      '<div style="font-family:var(--fm);font-size:8.5px;color:var(--tdim);margin-top:3px">'+
+        (x.t==='TBD'?'Horario a confirmar':'🕐 '+x.t+' hs')+
+        ' &nbsp;·&nbsp; '+(x.st||x.c)+
+      '</div>'+
+    '</div>';
+  });
+  document.getElementById('tt-teams').innerHTML=html;
+  document.getElementById('tt-date').innerHTML='';
+  document.getElementById('tt-time').innerHTML='';
+  document.getElementById('tt-stad').innerHTML='';
+  const gg=document.getElementById('tt-guard');
+  if(gs.length){const g=gs[0];
+    gg.innerHTML='<span class="tt-guard" style="background:'+g.c+'18;border:1px solid '+g.c+'44;color:'+g.c+'">Guardia '+g.id+' en turno</span>';
+  } else gg.innerHTML='';
 }
 function closeTT(e){
   if(e&&e.target!==document.getElementById('tt-ov'))return;
@@ -714,8 +762,8 @@ function buildDiagram(){
           const main=[...here].sort((a,b)=>(b.arg||0)-(a.arg||0))[0];
           const extra=here.length-1;
           const bc=main.arg?'ball arg':'ball wld';
-          const idx=M.indexOf(main);
-          inner='<div class="cell-in"><div class="'+bc+'" onclick="showTT('+idx+')" title="'+main.m.replace(/"/g,'')+'">⚽</div>'+(extra>0?'<div class="more">+'+extra+'</div>':'')+'</div>';
+          const idxs=here.map(mm=>M.indexOf(mm));
+          inner='<div class="cell-in"><div class="'+bc+'" onclick="showTT(['+idxs.join(',')+'])" title="'+main.m.replace(/"/g,'')+'">⚽</div>'+(extra>0?'<div class="more">+'+extra+'</div>':'')+'</div>';
         } else {
           const tc=t==='F'?'rgba(255,68,68,.45)':'var(--t'+t+')';
           inner='<span style="font-family:var(--fm);font-size:8px;font-weight:700;color:'+tc+'">'+t+'</span>';
@@ -812,15 +860,61 @@ async function fdFetch(path){
   return r.json();
 }
 
+const WC_START=new Date('2026-06-11T19:00:00Z'); // primer partido UTC
+
+function showCountdown(){
+  const el=document.getElementById('res-match-area');
+  document.getElementById('res-standing-area').innerHTML='';
+  // hide group tabs
+  document.getElementById('res-grp-tabs').style.display='none';
+  el.innerHTML='<div class="res-countdown" id="cd-wrap">'+
+    '<div class="res-cd-lbl">⏳ FALTAN PARA EL MUNDIAL 2026</div>'+
+    '<div class="res-cd-grid">'+
+      '<div class="res-cd-unit"><div class="res-cd-num" id="cd-d">--</div><div class="res-cd-tag">DÍAS</div></div>'+
+      '<div class="res-cd-unit"><div class="res-cd-num" id="cd-h">--</div><div class="res-cd-tag">HORAS</div></div>'+
+      '<div class="res-cd-unit"><div class="res-cd-num" id="cd-m">--</div><div class="res-cd-tag">MIN</div></div>'+
+      '<div class="res-cd-unit"><div class="res-cd-num" id="cd-s">--</div><div class="res-cd-tag">SEG</div></div>'+
+    '</div>'+
+    '<div class="res-cd-sub">⚽ Primer partido: <b>México vs Sudáfrica</b></div>'+
+    '<div class="res-cd-sub">📅 <b>11 Jun 2026 · Ciudad de México</b></div>'+
+  '</div>';
+  startCdTick();
+}
+
+let cdInterval=null;
+function startCdTick(){
+  if(cdInterval)clearInterval(cdInterval);
+  function tick(){
+    const diff=WC_START-new Date();
+    if(diff<=0){clearInterval(cdInterval);return;}
+    const d=Math.floor(diff/86400000);
+    const h=Math.floor((diff%86400000)/3600000);
+    const m=Math.floor((diff%3600000)/60000);
+    const s=Math.floor((diff%60000)/1000);
+    const pad=n=>String(n).padStart(2,'0');
+    const cd=document.getElementById('cd-d');
+    if(cd){
+      document.getElementById('cd-d').textContent=pad(d);
+      document.getElementById('cd-h').textContent=pad(h);
+      document.getElementById('cd-m').textContent=pad(m);
+      document.getElementById('cd-s').textContent=pad(s);
+    } else clearInterval(cdInterval);
+  }
+  tick();
+  cdInterval=setInterval(tick,1000);
+}
+
 async function loadResData(){
   if(resLoaded)return;
+  // if tournament hasn't started yet, show countdown
+  if(new Date()<WC_START){showCountdown();return;}
+  document.getElementById('res-grp-tabs').style.display='';
   try{
     const [mData, sData]=await Promise.all([
       fdFetch('/competitions/WC/matches'),
       fdFetch('/competitions/WC/standings')
     ]);
     fdMatches=mData.matches||[];
-    // build standings map by group
     if(sData.standings){
       sData.standings.forEach(sg=>{
         if(sg.stage==='GROUP_STAGE'&&sg.group){
@@ -832,8 +926,8 @@ async function loadResData(){
     resLoaded=true;
     renderRes();
   }catch(e){
-    document.getElementById('res-match-area').innerHTML=
-      '<div class="res-err">Error cargando datos. Verificá tu conexión.<br><small>'+e.message+'</small></div>';
+    // API error but tournament started — show countdown as fallback
+    showCountdown();
   }
 }
 
