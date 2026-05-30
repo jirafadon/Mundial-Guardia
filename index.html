@@ -266,9 +266,9 @@ table.gt td.td-today{outline:1px solid rgba(61,186,120,.45);outline-offset:-2px}
 .res-err{font-family:var(--fm);font-size:9px;color:#e05252;text-align:center;padding:16px}
 
 /* FOOTER */
-footer{text-align:center;margin-top:18px;padding-top:12px;border-top:1px solid var(--brd)}
-.fc{font-family:var(--fm);font-size:8px;color:var(--tdim);letter-spacing:1.5px;margin-bottom:3px}
-.fc span{color:var(--amber);font-weight:700}
+footer{text-align:center;margin-top:22px;padding-top:14px;border-top:1px solid var(--brd)}
+.fc{font-family:var(--fm);font-size:9px;color:var(--tdim);letter-spacing:1.5px;margin-bottom:3px}
+.fc span{color:var(--amber);font-weight:700;font-size:14px;letter-spacing:0;font-family:var(--ff)}
 </style>
 </head>
 <body>
@@ -367,9 +367,9 @@ footer{text-align:center;margin-top:18px;padding-top:12px;border-top:1px solid v
     <span class="si">📊</span>
     <span class="st" style="color:#3dba78">Resultados & Tabla</span>
     <span class="sbadge" id="res-badge">En vivo</span>
-    <span class="sarr" id="arr-res">▼</span>
+    <span class="sarr" id="arr-res">▲</span>
   </div>
-  <div class="sbody" id="body-res">
+  <div class="sbody open" id="body-res">
     <div class="res-group-sel" id="res-grp-tabs">
       <button class="rg-btn on" onclick="resGrp('all')" id="rg-all">TODOS</button>
       <button class="rg-btn arg-grp" onclick="resGrp('J')" id="rg-J">GRP J 🇦🇷</button>
@@ -616,6 +616,8 @@ function showTT(idxOrArr){
 function renderTTSingle(x){
   const gs=dutyG(x.d,x.t);
   const isArg=!!x.arg;
+  // restore rows hidden by multi mode
+  document.querySelectorAll('.tt-row').forEach(r=>r.style.display='');
   document.getElementById('tt-phase').textContent=PHL[x.p]||'';
   document.getElementById('tt-teams').innerHTML=isArg
     ? x.m.replace('Argentina','<span class="hl">Argentina</span>')
@@ -635,23 +637,25 @@ function renderTTMulti(matches){
   const x0=matches[0];
   const gs=dutyG(x0.d,x0.t);
   document.getElementById('tt-phase').textContent=fmtD(x0.d)+' · '+matches.length+' partidos';
-  // build list of matches
   let html='';
-  matches.forEach(x=>{
+  matches.forEach((x,i)=>{
     const isArg=!!x.arg;
     const teams=isArg?x.m.replace('Argentina','<span class="hl">Argentina</span>'):x.m;
-    html+='<div style="padding:7px 0;border-bottom:1px solid var(--brd);last-child:border-none">'+
+    html+='<div style="padding:8px 0;'+(i<matches.length-1?'border-bottom:1px solid var(--brd)':'')+'">'+
       '<div style="font-size:13px;font-weight:800;color:'+(isArg?'var(--arg)':'var(--tbright)')+'">'+teams+'</div>'+
-      '<div style="font-family:var(--fm);font-size:8.5px;color:var(--tdim);margin-top:3px">'+
-        (x.t==='TBD'?'Horario a confirmar':'🕐 '+x.t+' hs')+
-        ' &nbsp;·&nbsp; '+(x.st||x.c)+
+      '<div style="font-family:var(--fm);font-size:8.5px;color:var(--tdim);margin-top:4px">'+
+        '🕐 '+(x.t==='TBD'?'A confirmar':x.t+' hs')+
+        ' &nbsp;·&nbsp; 🏟 '+(x.st||x.c)+
       '</div>'+
     '</div>';
   });
   document.getElementById('tt-teams').innerHTML=html;
+  // hide the standalone emoji rows — they have no content in multi mode
   document.getElementById('tt-date').innerHTML='';
   document.getElementById('tt-time').innerHTML='';
   document.getElementById('tt-stad').innerHTML='';
+  // hide parent .tt-row divs so emojis don't show orphaned
+  document.querySelectorAll('.tt-row').forEach(r=>r.style.display='none');
   const gg=document.getElementById('tt-guard');
   if(gs.length){const g=gs[0];
     gg.innerHTML='<span class="tt-guard" style="background:'+g.c+'18;border:1px solid '+g.c+'44;color:'+g.c+'">Guardia '+g.id+' en turno</span>';
@@ -1065,6 +1069,7 @@ function fmtMatchDate(utc){
   buildArgSection();
   buildDiagram();
   buildList();
+  loadResData();
 })();
 </script>
 </body>
