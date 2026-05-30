@@ -786,12 +786,13 @@ function toggle(id){
   if(!b)return;
   const o=b.classList.toggle('open');
   if(a)a.textContent=o?'▲':'▼';
+  // live results lazy load
+  if(id==='res'&&o&&!resLoaded) loadResData();
 }
 function toggleTheme(){
   const l=document.body.classList.toggle('light');
   localStorage.setItem('m26t',l?'l':'d');
 }
-
 
 // ── LIVE RESULTS (football-data.org) ─────────────────────────────
 const FD_KEY='b5beb407d99c4ba3b6c7de8edfc45685';
@@ -944,7 +945,7 @@ function renderMatches(){
         '<div class="res-score'+(live?' live':'')+'">'+sc+'</div>'+
         '<div class="res-team right'+(aArg?' arg':'')+'">'+an+'</div>'+
       '</div>'+
-      '<div class="res-meta">'+m.venue+(m.matchday?'  ·  J'+m.matchday:'')+'</div>'+
+      '<div class="res-meta">'+(m.venue||'')+((m.venue&&m.matchday)?'  ·  ':'')+(m.matchday?'J'+m.matchday:'')+'</div>'+
       '</div>';
   });
   el.innerHTML=html;
@@ -960,16 +961,6 @@ function fmtMatchDate(utc){
   const hh=String(ba.getUTCHours()).padStart(2,'0');
   const mm=String(ba.getUTCMinutes()).padStart(2,'0');
   return dd+' '+dt+' '+mo+' '+hh+':'+mm+' hs';
-}
-
-// auto-load when section opens
-const _origToggle=toggle;
-function toggle(id){
-  _origToggle(id);
-  if(id==='res'){
-    const b=document.getElementById('body-res');
-    if(b&&b.classList.contains('open')&&!resLoaded) loadResData();
-  }
 }
 
 // ── INIT ──────────────────────────────────────────────────────────
