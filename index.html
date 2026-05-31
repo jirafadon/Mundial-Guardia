@@ -5,7 +5,12 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
 <meta name="theme-color" content="#080b0f">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>Guardia Puerto Nuevo · Mundial 2026</title>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Mundial 2026">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" href="favicon.png">
+<title>Mundial 2026 · Guardia Puerto Nuevo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700;800;900&family=DM+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -265,13 +270,39 @@ table.gt td.td-today{outline:1px solid rgba(61,186,120,.45);outline-offset:-2px}
 .res-loading{font-family:var(--fm);font-size:9px;color:var(--tdim);text-align:center;padding:20px;letter-spacing:1px}
 .res-err{font-family:var(--fm);font-size:9px;color:#e05252;text-align:center;padding:16px}
 
-/* FOOTER */
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.sec{animation:fadeUp .35s ease both}
+.sec:nth-child(1){animation-delay:.05s}.sec:nth-child(2){animation-delay:.1s}
+.sec:nth-child(3){animation-delay:.15s}.sec:nth-child(4){animation-delay:.2s}
+.sec:nth-child(5){animation-delay:.25s}
+
+/* NOTIF BUTTON */
+.notif-btn{display:flex;align-items:center;gap:7px;width:100%;margin-top:10px;
+  background:rgba(245,166,35,.07);border:1px solid rgba(245,166,35,.2);
+  border-radius:8px;padding:10px 13px;cursor:pointer;transition:all .2s}
+.notif-btn:active{background:rgba(245,166,35,.15)}
+.notif-btn-icon{font-size:18px;flex-shrink:0}
+.notif-btn-text{flex:1;text-align:left}
+.notif-btn-title{font-family:var(--fm);font-size:9px;color:var(--amber);letter-spacing:1.5px;margin-bottom:2px}
+.notif-btn-sub{font-family:var(--fm);font-size:8px;color:var(--tdim)}
+.notif-btn-arrow{font-family:var(--fm);font-size:10px;color:var(--tdim)}
+.notif-btn.granted{border-color:rgba(61,186,120,.2);background:rgba(61,186,120,.07)}
+.notif-btn.granted .notif-btn-title{color:#3dba78}
+
+/* OFFLINE BADGE */
+.offline-bar{display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;
+  background:#1a2230;border-top:1px solid var(--brd);padding:8px 16px;
+  font-family:var(--fm);font-size:8.5px;color:var(--tdim);text-align:center;letter-spacing:1px}
+.offline-bar.show{display:block}
 footer{text-align:center;margin-top:22px;padding-top:14px;border-top:1px solid var(--brd)}
 .fc{font-family:var(--fm);font-size:9px;color:var(--tdim);letter-spacing:1.5px;margin-bottom:3px}
 .fc span{color:var(--amber);font-weight:700;font-size:14px;letter-spacing:0;font-family:var(--ff)}
 </style>
 </head>
 <body>
+
+<div class="offline-bar" id="offline-bar">📵 Sin conexión · Mostrando datos guardados</div>
 
 <!-- TOOLTIP -->
 <div class="tt-ov" id="tt-ov" onclick="closeTT(event)">
@@ -423,6 +454,15 @@ footer{text-align:center;margin-top:22px;padding-top:14px;border-top:1px solid v
     <div class="match-list" id="match-list"></div>
   </div>
 </div>
+
+<button class="notif-btn" id="notif-btn" onclick="requestNotif()">
+  <span class="notif-btn-icon">🔔</span>
+  <span class="notif-btn-text">
+    <div class="notif-btn-title">NOTIFICACIONES DE ARGENTINA</div>
+    <div class="notif-btn-sub" id="notif-sub">Activar aviso antes de cada partido</div>
+  </span>
+  <span class="notif-btn-arrow">›</span>
+</button>
 
 <footer>
   <div class="fc">MUNDIAL 2026 · CENTRAL PUERTO PN</div>
@@ -1070,7 +1110,79 @@ function fmtMatchDate(utc){
   buildDiagram();
   buildList();
   loadResData();
+
+  // Service Worker
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  }
+
+  // Offline/online detection
+  function updateOnline(){
+    document.getElementById('offline-bar').classList.toggle('show',!navigator.onLine);
+  }
+  window.addEventListener('online', updateOnline);
+  window.addEventListener('offline', updateOnline);
+  updateOnline();
+
+  // Notification button state
+  updateNotifBtn();
 })();
+
+// ── NOTIFICATIONS ─────────────────────────────────────────────────
+function updateNotifBtn(){
+  const btn=document.getElementById('notif-btn');
+  const sub=document.getElementById('notif-sub');
+  if(!('Notification' in window)){btn.style.display='none';return;}
+  if(Notification.permission==='granted'){
+    btn.classList.add('granted');
+    sub.textContent='✓ Activadas · te avisamos 30 min antes';
+    btn.querySelector('.notif-btn-arrow').textContent='';
+  } else if(Notification.permission==='denied'){
+    sub.textContent='Bloqueadas en tu navegador · activalas en ajustes';
+    btn.querySelector('.notif-btn-arrow').textContent='';
+  }
+}
+
+async function requestNotif(){
+  if(!('Notification' in window))return;
+  if(Notification.permission==='granted'){scheduleArgNotifs();return;}
+  if(Notification.permission==='denied')return;
+  const perm=await Notification.requestPermission();
+  updateNotifBtn();
+  if(perm==='granted') scheduleArgNotifs();
+}
+
+function scheduleArgNotifs(){
+  // Argentina's hardcoded matches from fixture data
+  const argMatches=M.filter(x=>x.arg&&x.t&&x.t!=='TBD');
+  let scheduled=0;
+  argMatches.forEach(x=>{
+    // parse match datetime in Buenos Aires (UTC-3)
+    const [y,mo,d]=x.d.split('-').map(Number);
+    const [h,m]=x.t.split(':').map(Number);
+    // match time is already Buenos Aires → convert to UTC
+    const matchUTC=new Date(Date.UTC(y,mo-1,d,h+3,m));
+    const notifTime=matchUTC.getTime()-30*60*1000; // 30 min before
+    const now=Date.now();
+    if(notifTime>now){
+      const delay=notifTime-now;
+      setTimeout(()=>{
+        new Notification('⚽ Argentina juega en 30 minutos',{
+          body: x.m+' · '+x.t+' hs',
+          icon:'./icon-192.png',
+          badge:'./icon-192.png'
+        });
+      },delay);
+      scheduled++;
+    }
+  });
+  if(scheduled>0){
+    new Notification('Mundial 2026 · Notificaciones activadas',{
+      body:'Te avisamos 30 min antes de cada partido de Argentina ('+scheduled+' partido'+(scheduled>1?'s':'')+' por jugar)',
+      icon:'./icon-192.png'
+    });
+  }
+}
 </script>
 </body>
 </html>
