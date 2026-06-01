@@ -367,11 +367,12 @@ table.gt td.td-today{outline:1px solid rgba(61,186,120,.45);outline-offset:-2px}
 footer{text-align:center;margin-top:22px;padding-top:14px;border-top:1px solid var(--brd)}
 .fc{font-family:var(--fm);font-size:9px;color:var(--tdim);letter-spacing:1.5px;margin-bottom:3px}
 .fc span{color:var(--amber);font-weight:700;font-size:14px;letter-spacing:0;font-family:var(--ff)}
+.offline-bar{display:none;margin-top:12px;background:rgba(26,34,48,.5);border:1px solid var(--brd);
+  border-radius:7px;padding:7px 14px;font-family:var(--fm);font-size:8px;color:var(--tdim);letter-spacing:1px}
+.offline-bar.show{display:block}
 </style>
 </head>
 <body>
-
-<div class="offline-bar" id="offline-bar">📵 Sin conexión · Mostrando datos guardados</div>
 
 <!-- MATCH STATS OVERLAY -->
 <div class="ms-ov" id="ms-ov">
@@ -558,6 +559,7 @@ footer{text-align:center;margin-top:22px;padding-top:14px;border-top:1px solid v
 <footer>
   <div class="fc">MUNDIAL 2026 · CENTRAL PUERTO PN</div>
   <div class="fc" style="margin-top:4px">Página creada por <span>Joni de la planta</span></div>
+  <div class="offline-bar" id="offline-bar">📵 Sin conexión · Mostrando datos guardados</div>
 </footer>
 </div>
 
