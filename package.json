@@ -1,0 +1,15 @@
+{
+  "name": "guardiamundial2026",
+  "version": "1.0.0",
+  "description": "Fixture, diagrama de guardias y resultados del Mundial 2026",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "keywords": ["mundial", "2026", "guardia"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
+  }
+}

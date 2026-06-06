@@ -371,10 +371,10 @@ footer{text-align:center;margin-top:22px;padding-top:14px;border-top:1px solid v
   border-radius:7px;padding:7px 14px;font-family:var(--fm);font-size:8px;color:var(--tdim);letter-spacing:1px}
 .offline-bar.show{display:block}
 </style>
-<script>
-  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+<script type="module">
+  import { inject } from 'https://cdn.jsdelivr.net/npm/@vercel/analytics@2.0.1/dist/index.mjs';
+  inject();
 </script>
-<script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
 
@@ -925,7 +925,7 @@ function buildLegend(){
   el.innerHTML=G.map(g=>'<div class="gl" style="background:'+g.c+'14;border:1px solid '+g.c+'30;color:'+g.c+'">G'+g.id+'</div>').join('');
 }
 
-// ── FIXTURE ───────────────────────────────────────────────────────
+// ── FIXTURE ──────────────────────────────────���────────────────────
 let curP='all';
 function fp(p){
   curP=p;

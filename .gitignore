@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+# Lock files (optional - some teams commit these)
+# pnpm-lock.yaml
+
+# Build artifacts
+dist/
+build/
+.cache/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
