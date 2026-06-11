@@ -371,10 +371,6 @@ footer{text-align:center;margin-top:22px;padding-top:14px;border-top:1px solid v
   border-radius:7px;padding:7px 14px;font-family:var(--fm);font-size:8px;color:var(--tdim);letter-spacing:1px}
 .offline-bar.show{display:block}
 </style>
-<script>
-  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
-</script>
-<script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
 
@@ -1006,7 +1002,6 @@ const WC_START=new Date('2026-06-11T19:00:00Z'); // primer partido UTC
 function showCountdown(){
   const el=document.getElementById('res-match-area');
   document.getElementById('res-standing-area').innerHTML='';
-  // hide group tabs
   document.getElementById('res-grp-tabs').style.display='none';
   el.innerHTML='<div class="res-countdown" id="cd-wrap">'+
     '<div class="res-cd-lbl">⏳ FALTAN PARA EL MUNDIAL 2026</div>'+
@@ -1027,7 +1022,13 @@ function startCdTick(){
   if(cdInterval)clearInterval(cdInterval);
   function tick(){
     const diff=WC_START-new Date();
-    if(diff<=0){clearInterval(cdInterval);return;}
+    if(diff<=0){
+      clearInterval(cdInterval);
+      // Mundial started — try loading data now
+      resLoaded=false;
+      loadResData();
+      return;
+    }
     const d=Math.floor(diff/86400000);
     const h=Math.floor((diff%86400000)/3600000);
     const m=Math.floor((diff%3600000)/60000);
@@ -1050,6 +1051,7 @@ async function loadResData(){
   // if tournament hasn't started yet, show countdown
   if(new Date()<WC_START){showCountdown();return;}
   document.getElementById('res-grp-tabs').style.display='';
+  document.getElementById('res-match-area').innerHTML='<div class="res-loading">CARGANDO...</div>';
   try{
     const [mData, sData]=await Promise.all([
       fdFetch('/competitions/WC/matches'),
@@ -1067,8 +1069,16 @@ async function loadResData(){
     resLoaded=true;
     renderRes();
   }catch(e){
-    // API error but tournament started — show countdown as fallback
-    showCountdown();
+    // Show error with retry button instead of hiding everything
+    document.getElementById('res-grp-tabs').style.display='none';
+    document.getElementById('res-standing-area').innerHTML='';
+    document.getElementById('res-match-area').innerHTML=
+      '<div class="res-loading" style="color:var(--tdim)">'+
+        'No se pudieron cargar los datos.<br><br>'+
+        '<button onclick="resLoaded=false;loadResData()" style="background:none;border:1px solid var(--amber);'+
+        'color:var(--amber);font-family:var(--fm);font-size:9px;padding:8px 16px;border-radius:6px;cursor:pointer;letter-spacing:1px">'+
+        '↺ REINTENTAR</button>'+
+      '</div>';
   }
 }
 
