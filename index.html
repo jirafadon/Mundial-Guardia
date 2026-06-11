@@ -991,6 +991,76 @@ const KO_LABEL={'LAST_32':'16avos de Final','LAST_16':'Octavos de Final',
   'THIRD_PLACE':'3° Puesto','FINAL':'Gran Final'};
 const ARG_NAMES=['Argentina','Argentine Republic'];
 
+let AF_WC_LEAGUE_ID=null;
+
+async function afResFetch(params){
+  const url='https://apifootball3.p.rapidapi.com/?'+new URLSearchParams(params);
+  const r=await fetch(url,{headers:{'x-rapidapi-key':WC_RAPID_KEY,
+    'x-rapidapi-host':'apifootball3.p.rapidapi.com','Content-Type':'application/json'}});
+  if(!r.ok) throw new Error('HTTP '+r.status);
+  const j=await r.json();
+  return Array.isArray(j)?j:(j&&typeof j==='object'?Object.values(j):[]);
+}
+
+async function getWcLeagueId(){
+  if(AF_WC_LEAGUE_ID) return AF_WC_LEAGUE_ID;
+  const leagues=await afResFetch({action:'get_leagues',country_id:'0'});
+  const wc=leagues.find(l=>/world.cup/i.test(l.league_name||'')&&/2026/.test(l.league_season||l.league_year||''))
+    ||leagues.find(l=>/world.cup/i.test(l.league_name||''));
+  if(wc){AF_WC_LEAGUE_ID=wc.league_id;return AF_WC_LEAGUE_ID;}
+  return null;
+}
+
+function normalizeAfMatch(m){
+  const statusMap={'Finished':'FINISHED','1':'IN_PLAY','HT':'PAUSED','Cancelled':'CANCELLED'};
+  const grpRaw=m.league_round||m.match_round||'';
+  const grpLetter=grpRaw.replace(/group\s*/i,'').trim().toUpperCase().slice(0,1);
+  const isKo=/final|semifinal|quarter|round of/i.test(grpRaw);
+  return {
+    id:m.match_id,
+    utcDate:m.match_date+'T'+(m.match_time||'00:00')+':00Z',
+    status:statusMap[m.match_status]||'SCHEDULED',
+    matchday:parseInt(m.match_round)||null,
+    stage:isKo?'KNOCKOUT':'GROUP_STAGE',
+    group:grpLetter&&!isKo?'GROUP_'+grpLetter:null,
+    homeTeam:{name:m.match_hometeam_name,shortName:m.match_hometeam_name},
+    awayTeam:{name:m.match_awayteam_name,shortName:m.match_awayteam_name},
+    score:{fullTime:{home:m.match_hometeam_score!==''?parseInt(m.match_hometeam_score):null,
+                    away:m.match_awayteam_score!==''?parseInt(m.match_awayteam_score):null}},
+    venue:m.match_stadium||m.match_city||'',
+    _afRaw:m
+  };
+}
+
+function buildStandingsFromMatches(matches){
+  const tbl={};
+  matches.filter(m=>m.stage==='GROUP_STAGE'&&m.group).forEach(m=>{
+    const g=m.group.replace('GROUP_','');
+    if(!tbl[g])tbl[g]={};
+    [m.homeTeam.name,m.awayTeam.name].forEach(t=>{
+      if(!tbl[g][t])tbl[g][t]={team:{name:t,shortName:t},playedGames:0,won:0,draw:0,lost:0,
+        goalsFor:0,goalsAgainst:0,goalDifference:0,points:0};
+    });
+    if(m.status==='FINISHED'&&m.score.fullTime.home!==null){
+      const hg=m.score.fullTime.home,ag=m.score.fullTime.away;
+      const ht=m.homeTeam.name,at=m.awayTeam.name;
+      tbl[g][ht].playedGames++;tbl[g][at].playedGames++;
+      tbl[g][ht].goalsFor+=hg;tbl[g][ht].goalsAgainst+=ag;
+      tbl[g][at].goalsFor+=ag;tbl[g][at].goalsAgainst+=hg;
+      if(hg>ag){tbl[g][ht].won++;tbl[g][ht].points+=3;tbl[g][at].lost++;}
+      else if(hg<ag){tbl[g][at].won++;tbl[g][at].points+=3;tbl[g][ht].lost++;}
+      else{tbl[g][ht].draw++;tbl[g][ht].points++;tbl[g][at].draw++;tbl[g][at].points++;}
+    }
+  });
+  const result={};
+  Object.entries(tbl).forEach(([g,teams])=>{
+    result[g]=Object.values(teams)
+      .map(t=>({...t,goalDifference:t.goalsFor-t.goalsAgainst}))
+      .sort((a,b)=>b.points-a.points||b.goalDifference-a.goalDifference||b.goalsFor-a.goalsFor);
+  });
+  return result;
+}
+
 async function fdFetch(path){
   const r=await fetch(FD_BASE+path,{headers:{'X-Auth-Token':FD_KEY}});
   if(!r.ok) throw new Error('HTTP '+r.status);
@@ -1048,37 +1118,42 @@ function startCdTick(){
 
 async function loadResData(){
   if(resLoaded)return;
-  // if tournament hasn't started yet, show countdown
   if(new Date()<WC_START){showCountdown();return;}
   document.getElementById('res-grp-tabs').style.display='';
   document.getElementById('res-match-area').innerHTML='<div class="res-loading">CARGANDO...</div>';
   try{
-    const [mData, sData]=await Promise.all([
-      fdFetch('/competitions/WC/matches'),
-      fdFetch('/competitions/WC/standings')
-    ]);
-    fdMatches=mData.matches||[];
-    if(sData.standings){
-      sData.standings.forEach(sg=>{
-        if(sg.stage==='GROUP_STAGE'&&sg.group){
-          const letter=sg.group.replace('GROUP_','');
-          fdStandings[letter]=sg.table||[];
-        }
-      });
-    }
+    const leagueId=await getWcLeagueId();
+    if(!leagueId) throw new Error('Liga no encontrada en API');
+    const raw=await afResFetch({action:'get_events',from:'2026-06-11',to:'2026-07-19',league_id:leagueId});
+    if(!raw||!raw.length) throw new Error('Sin partidos');
+    fdMatches=raw.map(normalizeAfMatch);
+    fdStandings=buildStandingsFromMatches(fdMatches);
     resLoaded=true;
     renderRes();
   }catch(e){
-    // Show error with retry button instead of hiding everything
-    document.getElementById('res-grp-tabs').style.display='none';
-    document.getElementById('res-standing-area').innerHTML='';
-    document.getElementById('res-match-area').innerHTML=
-      '<div class="res-loading" style="color:var(--tdim)">'+
-        'No se pudieron cargar los datos.<br><br>'+
-        '<button onclick="resLoaded=false;loadResData()" style="background:none;border:1px solid var(--amber);'+
-        'color:var(--amber);font-family:var(--fm);font-size:9px;padding:8px 16px;border-radius:6px;cursor:pointer;letter-spacing:1px">'+
-        '↺ REINTENTAR</button>'+
-      '</div>';
+    try{
+      const mData=await fdFetch('/competitions/WC/matches');
+      fdMatches=mData.matches||[];
+      try{
+        const sData=await fdFetch('/competitions/WC/standings');
+        if(sData.standings) sData.standings.forEach(sg=>{
+          if(sg.stage==='GROUP_STAGE'&&sg.group)
+            fdStandings[sg.group.replace('GROUP_','')]=sg.table||[];
+        });
+      }catch(_){}
+      resLoaded=true;
+      renderRes();
+    }catch(e2){
+      document.getElementById('res-grp-tabs').style.display='none';
+      document.getElementById('res-standing-area').innerHTML='';
+      document.getElementById('res-match-area').innerHTML=
+        '<div class="res-loading" style="color:var(--tdim)">'+
+          '<div style="color:#e05252;margin-bottom:8px">'+e.message+'</div>'+
+          '<div style="font-size:8px;margin-bottom:14px">'+e2.message+'</div>'+
+          '<button onclick="resLoaded=false;loadResData()" style="background:none;border:1px solid var(--amber);'+
+          'color:var(--amber);font-family:var(--fm);font-size:9px;padding:8px 16px;border-radius:6px;cursor:pointer;letter-spacing:1px">'+
+          '↺ REINTENTAR</button></div>';
+    }
   }
 }
 
