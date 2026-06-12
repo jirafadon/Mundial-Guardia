@@ -997,35 +997,44 @@ const FD_KEY='b5beb407d99c4ba3b6c7de8edfc45685';
 const WC26_BASE='https://worldcup26.ir/get';
 let fdMatches=[], fdStandings={}, curResGrp='all', resLoaded=false;
 
-async function wc26Fetch(endpoint){
-  const r=await fetch(WC26_BASE+endpoint,{headers:{'Accept':'application/json'}});
+// Static JSON from GitHub repo — no auth, no CORS, updated during tournament
+const GH_RAW='https://raw.githubusercontent.com/rezarahiminia/worldcup2026/main';
+
+async function ghFetch(file){
+  const r=await fetch(GH_RAW+'/'+file);
   if(!r.ok) throw new Error('HTTP '+r.status);
   return r.json();
 }
 
-function normalizeWc26Match(m){
-  const st=m.status||'scheduled';
-  const statusMap={scheduled:'SCHEDULED',live:'IN_PLAY',finished:'FINISHED',halftime:'PAUSED'};
-  const grpRaw=m.group||m.groupName||'';
-  const grp=grpRaw.replace(/group\s*/i,'').trim().toUpperCase().slice(0,1);
-  const isKo=/knockout|round of|16|quarter|semi|final/i.test(m.stage||m.round||'');
-  const hScore=m.homeScore??m.home_score??m.score?.home??null;
-  const aScore=m.awayScore??m.away_score??m.score?.away??null;
-  const hn=m.homeTeam||m.home_team||m.hometeam||'';
-  const an=m.awayTeam||m.away_team||m.awayteam||'';
+function normalizeWc26Match(m, teamsMap){
+  const fin=m.finished==='TRUE'||m.finished===true;
+  const live=m.time_elapsed&&m.time_elapsed!=='notstarted'&&!fin;
+  const isKo=m.type==='knockout'||m.type==='thirdplace'||m.type==='final';
+  const grp=m.group?m.group.toUpperCase():'';
+  const hn=teamsMap[m.home_team_id]||'?';
+  const an=teamsMap[m.away_team_id]||'?';
+  // parse date: "06/11/2026 13:00" → UTC
+  let utcDate='';
+  try{
+    const[datePart,timePart]=(m.local_date||'').split(' ');
+    const[mo,dd,yyyy]=datePart.split('/');
+    utcDate=yyyy+'-'+mo+'-'+dd+'T'+(timePart||'00:00')+':00Z';
+  }catch(_){}
+  const hg=m.home_score!==undefined&&m.home_score!==null&&m.home_score!=='0'&&fin?parseInt(m.home_score):
+            m.home_score&&fin?parseInt(m.home_score):null;
+  const ag=m.away_score!==undefined&&m.away_score!==null&&m.away_score!=='0'&&fin?parseInt(m.away_score):
+            m.away_score&&fin?parseInt(m.away_score):null;
   return {
-    id:m.id||m.matchId||m.match_id,
-    utcDate:m.datetime||m.date||(m.matchDate+'T00:00:00Z'),
-    status:statusMap[st]||'SCHEDULED',
+    id:m.id,
+    utcDate,
+    status:live?'IN_PLAY':fin?'FINISHED':'SCHEDULED',
     stage:isKo?'KNOCKOUT':'GROUP_STAGE',
     group:grp&&!isKo?'GROUP_'+grp:null,
     homeTeam:{name:hn,shortName:hn},
     awayTeam:{name:an,shortName:an},
-    score:{fullTime:{
-      home:hScore!==null&&hScore!==undefined?parseInt(hScore):null,
-      away:aScore!==null&&aScore!==undefined?parseInt(aScore):null
-    }},
-    venue:m.stadium||m.venue||m.ground||'',
+    score:{fullTime:{home:fin?parseInt(m.home_score||0):null, away:fin?parseInt(m.away_score||0):null}},
+    venue:m.stadium_name||'',
+    matchday:parseInt(m.matchday)||null,
     _raw:m
   };
 }
@@ -1174,28 +1183,20 @@ async function loadResData(){
   document.getElementById('res-grp-tabs').style.display='';
   document.getElementById('res-match-area').innerHTML='<div class="res-loading">CARGANDO...</div>';
 
-  // Source 1: worldcup26.ir — free, no key, CORS open
+  // Source 1: GitHub raw JSON (rezarahiminia/worldcup2026) — no auth, no CORS
   try{
-    const [games,groups]=await Promise.all([wc26Fetch('/games'),wc26Fetch('/groups')]);
-    const matchList=Array.isArray(games)?games:(games.data||games.games||games.matches||[]);
-    if(!matchList.length) throw new Error('Sin partidos');
-    fdMatches=matchList.map(normalizeWc26Match);
-    // Build standings from /groups endpoint
-    if(Array.isArray(groups)&&groups.length){
-      groups.forEach(g=>{
-        const letter=(g.name||g.group||'').replace(/group\s*/i,'').trim().toUpperCase().slice(0,1);
-        if(!letter)return;
-        const teams=(g.teams||g.standings||[]).map(t=>({
-          team:{name:t.team||t.teamName||t.name||'',shortName:t.team||t.teamName||t.name||''},
-          playedGames:parseInt(t.played||t.pj||0),
-          won:parseInt(t.won||t.w||0),draw:parseInt(t.drawn||t.d||0),lost:parseInt(t.lost||t.l||0),
-          goalsFor:parseInt(t.goalsFor||t.gf||0),goalsAgainst:parseInt(t.goalsAgainst||t.ga||0),
-          goalDifference:parseInt(t.goalDifference||t.gd||0),points:parseInt(t.points||t.pts||0)
-        }));
-        if(teams.length)fdStandings[letter]=teams;
-      });
-    }
-    if(!Object.keys(fdStandings).length)fdStandings=buildStandingsFromMatches(fdMatches);
+    const [matches,teams]=await Promise.all([
+      ghFetch('football.matches.json'),
+      ghFetch('football.teams.json')
+    ]);
+    const matchArr=Array.isArray(matches)?matches:[];
+    const teamArr=Array.isArray(teams)?teams:[];
+    if(!matchArr.length) throw new Error('Sin partidos');
+    // Build id→name map
+    const teamsMap={};
+    teamArr.forEach(t=>{if(t.id)teamsMap[t.id]=t.name_en||t.name||'?';});
+    fdMatches=matchArr.map(m=>normalizeWc26Match(m,teamsMap));
+    fdStandings=buildStandingsFromMatches(fdMatches);
     resLoaded=true;
     renderRes();
   }catch(e1){
